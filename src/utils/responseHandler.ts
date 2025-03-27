@@ -5,13 +5,15 @@ class ResponseHandler {
     res: Response,
     status: number,
     message: string,
-    data?: any
+    data?: any,
+    total?:number
   ): Response {
     return res.status(status).json({
       status,
       success: true,
       message,
       data,
+      total
     });
   }
   static error(

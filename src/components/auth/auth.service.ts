@@ -1,15 +1,51 @@
 
-
+import AuthMiddleware from "../../middleware/authVerification";
+import passwordManager from "../../utils/passwordManager";
+import { ResponseHandlerThrow } from "../../utils/responseHandler";
+import EmployeeDao from "../employee/employee.dao";
 
 class AuthService {
+  private employeeDao: EmployeeDao;
 
-  public register(){
-
-
+  constructor() {
+    this.employeeDao = new EmployeeDao();
   }
 
+  public authenticateEmployee = async (
+    email: string,
+    password: string
+  ): Promise<any> => {
+    try {
+      if (!email || !password) {
+        ResponseHandlerThrow.throw(404, false, "Email and password required");
+      }
+      const pipeline = [
+        {
+          $match: { email: email },
+        },
+      ];
+      const employee = await this.employeeDao.getUserByIdOrEmail(pipeline);
 
+      if (!employee.length) {
+        ResponseHandlerThrow.throw(404, false, "Invalid email or password");
+      } else {
+        const decryptPassword = await passwordManager.comparePassword(
+          password,
+          employee[0].password
+        );
 
+        if (!decryptPassword) {
+          ResponseHandlerThrow.throw(404, false, "Invalid email or password");
+        }
+
+        
+        const tokens = await AuthMiddleware.createAccessToken(employee[0]);
+        return tokens;
+      }
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(error.status, false, error.message);
+    }
+  };
 }
 
-export default AuthService
+export default AuthService;

@@ -3,6 +3,7 @@ import { Server } from "http";
 import { config } from "dotenv";
 import MongoDBConnection from "./config/dbConnection";
 import InitialRoute from "./config/routes";
+import { ResponseHandler } from "./utils/responseHandler";
 config();
 
 const app: Application = express();
@@ -16,6 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   (error: Error, request: Request, response: Response, next: NextFunction) => {
     if (error) {
+      ResponseHandler.error(response, 500, error.message);
+    } else {
+      next();
     }
   }
 );

@@ -20,18 +20,22 @@ export interface ICompany extends Document {
 
 const companySchema: Schema<ICompany> = new mongoose.Schema(
   {
-    name: { type: String, unique: true },
-    email: { type: String, unique: true, lowercase: true },
+    name: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     address: {
-      line1: { type: String },
+      line1: { type: String, required: true },
       line2: { type: String },
-      city: { type: String },
-      state: { type: String },
-      country: { type: String },
-      zip: { type: Number },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      country: { type: String, required: true },
+      zip: { type: String, required: true },
     },
-    contact: { type: Number },
-    status: { type: String, enum: Object.values(CompanyStatus) },
+    contact: { type: Number, required: true },
+    status: {
+      type: String,
+      required: true,
+      enum: Object.values(CompanyStatus),
+    },
   },
   {
     timestamps: true,
