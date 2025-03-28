@@ -13,29 +13,28 @@ class CompanyDao {
 
   public getCompanyByIdOrEmail = async (pipeline: any[]): Promise<any> => {
     try {
-      const company = await CompanyModel.aggregate(pipeline);
-      return company;
+      return await CompanyModel.aggregate(pipeline);
     } catch (error) {
-      console.error("Error getCompanyByIdOrEmail", error);
       ResponseHandlerThrow.throw(500, false, "Internal server error");
     }
   };
 
-  public getCompanyByEmailAndUpdate = async (
-    email: string
-  ): Promise<boolean> => {
+
+  public deleteCompanyById = async (id: string): Promise<ICompany | null> => {
     try {
-      const company = await CompanyModel.findOneAndUpdate(
-        { email: email },
-        { $set: { isVerified: true } },
-        {
-          new: true,
-        }
-      );
-      if (!company) {
-        ResponseHandlerThrow.throw(500, false, "Internal server error");
-      }
-      return true;
+      return await CompanyModel.findByIdAndDelete(id);
+    } catch (error) {
+      console.error("Error", error);
+      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    }
+  };
+
+  public updateCompanyById = async (
+    data: ICompany | any,
+    id: string
+  ): Promise<ICompany | null> => {
+    try {
+      return await CompanyModel.findByIdAndUpdate(id, data, { new: true });
     } catch (error) {
       console.error("Error", error);
       ResponseHandlerThrow.throw(500, false, "Internal server error");

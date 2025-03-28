@@ -10,7 +10,7 @@ class CompanyService {
     this.companyDao = new CompanyDao();
   }
 
-  public createEmployee = async (companyData: ICompany): Promise<any> => {
+  public createCompany = async (companyData: ICompany): Promise<any> => {
     try {
       const pipeline: any[] = [{ $match: { email: companyData.email } }];
 
@@ -26,6 +26,21 @@ class CompanyService {
 
       const createCompany = await this.companyDao.createCompany(companyData);
       return createCompany;
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(error.status, false, error.message);
+    }
+  };
+
+  public updateFullCompany = async (
+    companyData: any,
+    id: string
+  ): Promise<any> => {
+    try {
+      const updatedCompany = await this.companyDao.updateCompanyById(
+        companyData,
+        id
+      );
+      return updatedCompany;
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
     }
@@ -69,6 +84,15 @@ class CompanyService {
       const companyDetails: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
       return companyDetails;
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(error.status, false, error.message);
+    }
+  };
+  
+  public deleteCompany = async (id: string): Promise<any> => {
+    try {
+      const deletedCompany = await this.companyDao.deleteCompanyById(id);
+      return deletedCompany;
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
     }

@@ -8,6 +8,7 @@ import EmployeeService from "../employee/employee.service";
 import EmailVerifyAndSend from "../../utils/emailVerifyAndSend";
 import AuthService from "./auth.service";
 import AuthMiddleware from "../../middleware/authVerification";
+import logger from "../../utils/logger";
 
 class AuthController {
   private employeeService: EmployeeService;
@@ -26,6 +27,7 @@ class AuthController {
   ): Promise<void> => {
     try {
       if (!request.body) {
+        logger.error("no body found")
         ResponseHandler.error(response, 400, "No body found");
       }
       const validateEmp = await validateEmployee(request.body);
@@ -35,13 +37,10 @@ class AuthController {
           .join(", ");
         ResponseHandlerThrow.throw(404, false, errorMessages);
       }
-
       const newEmployee = await this.employeeService.createEmployee(
         request.body
       );
-
-      const sendMail = this.emailVerifyAndSend.sendEmail(request.body.email);
-
+      const sendMail = await this.emailVerifyAndSend.sendEmail(request.body.email);
       ResponseHandler.success(
         response,
         201,
@@ -74,7 +73,7 @@ class AuthController {
   ): Promise<void> => {
     try {
       if (!request.body) {
-        ResponseHandler.error(response, 404, "No body found");
+        ResponseHandlerThrow.throw(400, false, "No body found");
       }
       const { email, password } = request.body;
       const data = await this.authService.authenticateEmployee(email, password);
@@ -95,7 +94,7 @@ class AuthController {
   ): Promise<void> => {
     try {
       if (!request.body.refreshToken) {
-        ResponseHandler.error(response, 404, "No token found");
+        ResponseHandlerThrow.throw(400, false, "No token found");
       }
       const { refreshToken } = request.body;
       const data = await AuthMiddleware.createRefreshToken(refreshToken);

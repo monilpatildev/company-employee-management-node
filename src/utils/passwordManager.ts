@@ -4,19 +4,12 @@ import { ResponseHandlerThrow } from "./responseHandler";
 config();
 
 class PasswordManager {
-  private salt: any;
-
-  constructor() {
-    this.salt = process.env.SALT;
-  }
-
   public async hashPassword(password: string): Promise<string> {
     try {
-      
+      const salt: string | any = process.env.SALT;
       const hashedPassword = await crypto
-      .pbkdf2Sync(password, this.salt, 1000, 16, `sha512`)
-      .toString(`hex`);
-      console.log(this.salt,hashedPassword);
+        .pbkdf2Sync(password, salt, 1000, 16, `sha512`)
+        .toString(`hex`);
       return hashedPassword;
     } catch (error) {
       ResponseHandlerThrow.throw(500, false, "Internal server error");
@@ -28,11 +21,10 @@ class PasswordManager {
     hash: string
   ): Promise<boolean> {
     try {
+      const salt: string | any = process.env.SALT;
       const hashedPassword = await crypto
-        .pbkdf2Sync(password, this.salt, 1000, 16, `sha512`)
+        .pbkdf2Sync(password, salt, 1000, 16, `sha512`)
         .toString(`hex`);
-        console.log(hashedPassword);
-        
       if (hashedPassword !== hash) {
         return false;
       }

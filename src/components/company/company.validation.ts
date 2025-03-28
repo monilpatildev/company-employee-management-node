@@ -2,7 +2,7 @@ import Joi from "joi";
 import { ICompany } from "./company.model";
 import { CompanyStatus } from "../../common/enums";
 
-export const validateCompany = (data: ICompany, isPatch: boolean = false) => {
+const validateCompany = (data: ICompany, isPatch: boolean = false) => {
   const validateSchema = Joi.object({
     name: Joi.string()
       .when("$isPatch", {
@@ -86,9 +86,13 @@ export const validateCompany = (data: ICompany, isPatch: boolean = false) => {
           "number.base": "zip must be a number",
         }),
     })
-      .required()
+      .when("$isPatch", {
+        is: true,
+        then: Joi.optional(),
+        otherwise: Joi.required(),
+      })
       .messages({
-        "any.required": "Address is required"
+        "any.required": "Address is required",
       }),
 
     contact: Joi.string()
@@ -123,3 +127,5 @@ export const validateCompany = (data: ICompany, isPatch: boolean = false) => {
     context: { isPatch },
   });
 };
+
+export default validateCompany;

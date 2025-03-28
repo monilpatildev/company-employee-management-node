@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validateCompany } from "./company.validation";
+import validateCompany from "./company.validation";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
@@ -18,7 +18,7 @@ class CompanyController {
   ): Promise<void> => {
     try {
       if (!request.body) {
-        ResponseHandler.error(response, 400, "No body found");
+        ResponseHandlerThrow.throw(400, false, "No body found");
       }
       const validateEmp = await validateCompany(request.body);
       if (validateEmp.error) {
@@ -27,9 +27,7 @@ class CompanyController {
           .join(", ");
         ResponseHandlerThrow.throw(400, false, errorMessages);
       }
-
-      const newCompany = await this.companyService.createEmployee(request.body);
-
+      const newCompany = await this.companyService.createCompany(request.body);
       ResponseHandler.success(
         response,
         201,
@@ -62,11 +60,63 @@ class CompanyController {
   public updateCompany = async (
     request: Request,
     response: Response
-  ): Promise<void> => {};
+  ): Promise<void> => {
+    try {
+      if (!request.body && !request.params.id) {
+        ResponseHandlerThrow.throw(400, false, "No body or id found");
+      }
+      const validateEmp = await validateCompany(request.body);
+      if (validateEmp.error) {
+        const errorMessages = validateEmp.error.details
+          .map((detail) => detail.message)
+          .join(", ");
+        ResponseHandlerThrow.throw(400, false, errorMessages);
+      }
+      const newCompany = await this.companyService.updateFullCompany(
+        request.body,
+        request.params.id
+      );
+      ResponseHandler.success(
+        response,
+        201,
+        "Company updated successFully!",
+        newCompany
+      );
+    } catch (error: any) {
+      ResponseHandler.error(response, error.status, error.message);
+    }
+  };
+
   public modifyCompany = async (
     request: Request,
     response: Response
-  ): Promise<void> => {};
+  ): Promise<void> => {
+    try {
+      if (!request.body && !request.params.id) {
+        ResponseHandlerThrow.throw(400, false, "No body or id found");
+      }
+      const validateEmp = await validateCompany(request.body, true);
+      if (validateEmp.error) {
+        const errorMessages = validateEmp.error.details
+          .map((detail) => detail.message)
+          .join(", ");
+        ResponseHandlerThrow.throw(400, false, errorMessages);
+      }
+      const newCompany = await this.companyService.updateFullCompany(
+        request.body,
+        request.params.id
+      );
+      ResponseHandler.success(
+        response,
+        201,
+        "Company updated successFully!",
+        newCompany
+      );
+    } catch (error: any) {
+      ResponseHandler.error(response, error.status, error.message);
+    }
+  };
+
   public getCompany = async (
     request: Request,
     response: Response
@@ -78,6 +128,10 @@ class CompanyController {
       const foundCompany = await this.companyService.getCompanyDetail(
         request.params.id
       );
+      
+      if (!foundCompany.length) {
+        ResponseHandlerThrow.throw(400, false, "No company found!");
+      }
       ResponseHandler.success(
         response,
         201,
@@ -88,6 +142,7 @@ class CompanyController {
       ResponseHandler.error(response, error.status, error.message);
     }
   };
+
   public deleteCompany = async (
     request: Request,
     response: Response
@@ -96,15 +151,13 @@ class CompanyController {
       if (!request.params.id) {
         ResponseHandlerThrow.throw(400, false, "Id required");
       }
-      const foundCompany = await this.companyService.getCompanyDetail(
+      const foundCompany = await this.companyService.deleteCompany(
         request.params.id
       );
-      ResponseHandler.success(
-        response,
-        201,
-        "Fetch company successFully!",
-        foundCompany[0]
-      );
+      if (!foundCompany) {
+        ResponseHandlerThrow.throw(400, false, "No company found!");
+      }
+      ResponseHandler.success(response, 201, "Company deleted successFully!");
     } catch (error: any) {
       ResponseHandler.error(response, error.status, error.message);
     }

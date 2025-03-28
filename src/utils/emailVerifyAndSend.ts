@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { ResponseHandlerThrow } from "./responseHandler";
 import TokenEncryptDecrypt from "./tokenEncryptionDecryption";
 import EmployeeDao from "../components/employee/employee.dao";
+import ejs from "ejs";
+import path from "path";
 
 class EmailVerifyAndSend {
   private appPassword: any;
@@ -15,6 +17,11 @@ class EmailVerifyAndSend {
   public sendEmail = async (email: string): Promise<void> => {
     try {
       const token = await TokenEncryptDecrypt.encryptToken(email);
+      const verificationLink = `${process.env.SERVER_BASE_URL}/api/account-verify/${token}`;
+
+      const templatePath = path.join(__dirname, "../view/email.ejs");
+      const html = await ejs.renderFile(templatePath, { verificationLink });
+
       const transport = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -27,11 +34,11 @@ class EmailVerifyAndSend {
         to: email,
         subject: "Verify Your Email Address",
         text: "Hello from gmail text using API",
-        html: `<h1>Here's your verification token: <strong>${token}</strong></h1>`,
+        html,
       };
 
       const result = await transport.sendMail(mailOptions);
-    } catch (error:any) {
+    } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
     }
   };
@@ -43,15 +50,13 @@ class EmailVerifyAndSend {
       if (!emailRegex.test(decryptedEmail)) {
         ResponseHandlerThrow.throw(400, false, "Invalid token");
       }
-      const employee = await this.employeeDao.getUserByIdOrEmail([
+      const employee = await this.employeeDao.getEmployeeByIdOrEmail([
         { $match: { email: decryptedEmail } },
       ]);
-      console.log(employee);
-
       if (employee[0].isVerified === true) {
         ResponseHandlerThrow.throw(400, false, "Employee already verified");
       } else {
-        await this.employeeDao.getUserByEmailAndUpdate(decryptedEmail);
+        await this.employeeDao.getEmployeeByEmailAndUpdate(decryptedEmail);
         return true;
       }
     } catch (error: any) {

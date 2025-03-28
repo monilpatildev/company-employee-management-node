@@ -1,11 +1,12 @@
 import jwt from "jsonwebtoken";
+import { config } from "dotenv";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
 } from "../utils/responseHandler";
 import EmployeeDao from "../components/employee/employee.dao";
-import { config } from "dotenv";
 import { NextFunction, Request, Response } from "express";
+import { Role } from "../common/enums";
 config();
 
 class AuthMiddleware {
@@ -55,51 +56,56 @@ class AuthMiddleware {
     }
   };
 
-  public static verifyToken = async (
-    request: any,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const accessSecretKey = process.env.ACCESS_SECRET_KEY || "Access secret";
-      const refreshSecretKey =
-        process.env.REFRESH_SECRET_KEY || "Refresh secret";
-
-      const accessToken: string | undefined =
-        request.headers.authorization?.split(" ")[1];
-      if (!accessToken) {
-        ResponseHandler.error(response, 401, "Invalid Token");
-      } else {
-        try {
-          const verifyRefreshToken: any = await jwt.verify(
-            accessToken,
-            accessSecretKey
-          );
-          request.user = verifyRefreshToken;
-          const pipeline: any = [
-            {
-              $match: {
-                email: verifyRefreshToken.email,
+  public static verifyToken(allowedRoles: Role[]) {
+    return async (request: Request, response: Response, next: NextFunction) => {
+      try {
+        const accessSecretKey: string | any=
+          process.env.ACCESS_SECRET_KEY;
+        const accessToken: string | undefined =
+          request.headers.authorization?.split(" ")[1];
+        if (!accessToken) {
+          ResponseHandler.error(response, 401, "Invalid Token");
+        } else {
+          try {
+            const verifyRefreshToken: any = await jwt.verify(
+              accessToken,
+              accessSecretKey
+            );
+            const pipeline: any = [
+              {
+                $match: {
+                  email: verifyRefreshToken.email,
+                },
               },
-            },
-          ];
-          const employeeData = await this.employeeDao.getUserByIdOrEmail(
-            pipeline
-          );
-          if (employeeData[0].role !== "ADMIN") {
-            ResponseHandler.error(response, 403, "You cannot access this page");
-          } else {
-            next();
+            ];
+            const employeeData = await this.employeeDao.getEmployeeByIdOrEmail(
+              pipeline
+            );
+            if (!employeeData.length) {
+              return ResponseHandlerThrow.throw(404, false, "Invalid token");
+            }
+
+            const userRole = employeeData[0].role;
+
+            if (!allowedRoles.includes(userRole)) {
+              return ResponseHandlerThrow.throw(
+                403,
+                false,
+                "You cannot access this page"
+              );
+            } else {
+              next();
+            }
+          } catch (error: any) {
+            console.log("error", error);
+            ResponseHandler.error(response, 401, error.message);
           }
-        } catch (error: any) {
-          console.log("error", error);
-          ResponseHandler.error(response, 401, error.message);
         }
+      } catch (error: any) {
+        ResponseHandler.error(response, error.status, error.message);
       }
-    } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
-    }
-  };
+    };
+  }
 }
 
 export default AuthMiddleware;
