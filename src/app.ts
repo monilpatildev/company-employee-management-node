@@ -1,40 +1,50 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import { Server } from "http";
 import { config } from "dotenv";
+import { rateLimit } from "express-rate-limit";
+import path from "path";
+
 import MongoDBConnection from "./config/dbConnection";
 import InitialRoute from "./config/routes";
 import { ResponseHandler } from "./utils/responseHandler";
-import path from "path";
-import { rateLimit } from "express-rate-limit";
+
 config();
 
 const app: Application = express();
-
-const PORT = process.env.PORT || 4000;
-const MONGODB_URI = process.env.MONGODB_URI;
+const PORT: number = parseInt(process.env.PORT || "4000", 10);
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  limit: 100,
-  message: "You can not make 100+ request from same IP, try again after 1 min.",
+  windowMs: 60 * 1000,
+  max: 100,
+  message:
+    "You cannot make more than 100 requests per minute from the same IP.",
 });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
-app.use(
-  (error: Error, request: Request, response: Response, next: NextFunction) => {
-    if (error) {
-      ResponseHandler.error(response, 500, error.message);
-    } else {
-      next();
-    }
+app.use((err: any, request: Request, res: Response, next: NextFunction) => {
+  if (err instanceof SyntaxError && "body" in err) {
+    console.error("Bad JSON syntax:", err);
+    console.log(err);
+    
+    ResponseHandler.error(res, 400, "Invalid JSON syntax");
+  } else {
+    next();
   }
-);
-
-const server: Server = app.listen(PORT, () => {
-  InitialRoute.routes(app);
-  MongoDBConnection.connect(`${MONGODB_URI}`);
-  console.log(`Server running on ${PORT}`);
 });
+
+app.use((error: Error, request: Request, res: Response, next: NextFunction) => {
+  console.error("An error occurred:", error);
+  ResponseHandler.error(res, 500, error.message);
+});
+
+const server: Server = app.listen(PORT, async () => {
+  MongoDBConnection.connect(MONGODB_URI);
+  InitialRoute.routes(app);
+  console.log(`Server running on port ${PORT}`);
+});
+
+export default app;

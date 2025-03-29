@@ -9,24 +9,26 @@ export const validateEmployee = (
 ) => {
   if (isPatch) {
     const patchSchema = Joi.object({
-      companyId: Joi.string().required().messages({
+      companyId: Joi.string().empty("").required().messages({
         "string.base": "companyId must be a string",
+        "string.empty": "companyId cannot be empty",
         "any.required": "companyId is required",
       }),
-      firstName: Joi.any().forbidden(),
-      lastName: Joi.any().forbidden(),
-      email: Joi.any().forbidden(),
-      password: Joi.any().forbidden(),
-      designation: Joi.any().forbidden(),
-      isVerified: Joi.any().forbidden(),
-      reporters: Joi.any().forbidden(),
-      code: Joi.any().forbidden(),
+      firstName: Joi.forbidden(),
+      lastName: Joi.forbidden(),
+      email: Joi.forbidden(),
+      password: Joi.forbidden(),
+      designation: Joi.forbidden(),
+      isVerified: Joi.forbidden(),
+      reporters: Joi.forbidden(),
+      code: Joi.forbidden(),
     }).unknown(false);
 
     return patchSchema.validate(data, { abortEarly: false });
   } else {
     const fullSchema = Joi.object({
       firstName: Joi.string()
+        .empty("")
         .when("$isPut", {
           is: true,
           then: Joi.optional(),
@@ -34,9 +36,11 @@ export const validateEmployee = (
         })
         .messages({
           "string.base": "firstName must be a string",
+          "string.empty": "firstName cannot be empty",
           "any.required": "firstName is required",
         }),
       lastName: Joi.string()
+        .empty("")
         .when("$isPut", {
           is: true,
           then: Joi.optional(),
@@ -44,9 +48,11 @@ export const validateEmployee = (
         })
         .messages({
           "string.base": "lastName must be a string",
+          "string.empty": "lastName cannot be empty",
           "any.required": "lastName is required",
         }),
       email: Joi.string()
+        .empty("")
         .when("$isPut", {
           is: true,
           then: Joi.optional(),
@@ -57,9 +63,11 @@ export const validateEmployee = (
         .messages({
           "string.base": "email must be a string",
           "string.email": "email must be a valid email",
+          "string.empty": "email cannot be empty",
           "any.required": "email is required",
         }),
       password: Joi.string()
+        .empty("")
         .when("$isPut", {
           is: true,
           then: Joi.optional(),
@@ -67,22 +75,28 @@ export const validateEmployee = (
         })
         .messages({
           "string.base": "password must be a string",
+          "string.empty": "password cannot be empty",
           "any.required": "password is required",
         }),
       companyId: Joi.string()
+        .empty("")
         .when("$isPut", {
           is: true,
           then: Joi.optional(),
+          otherwise: Joi.required(),
         })
         .messages({
           "string.base": "companyId must be a string",
+          "string.empty": "companyId cannot be empty",
           "any.required": "companyId is required",
         }),
       designation: Joi.string()
+        .empty("")
         .valid(...Object.values(Designation))
         .messages({
           "string.base": "designation must be a string",
-          "any.required": "designation is required",
+          "string.empty": "designation cannot be empty",
+          // "any.required": "designation is required",
           "any.only":
             "designation must be one of 'MANAGER', 'TEAM_LEADER', or 'DEVELOPER'",
         }),
@@ -91,18 +105,14 @@ export const validateEmployee = (
       }),
       reporters: Joi.array().items(Joi.string()).messages({
         "array.base": "reporters must be an array",
-        "any.required": "reporters is required",
+        // "any.required": "reporters is required",
       }),
       code: Joi.number().messages({
         "number.base": "code must be a number",
-        "any.required": "code is required",
       }),
     });
 
-    return fullSchema.validate(data, {
-      abortEarly: false,
-      context: { isPut },
-    });
+    return fullSchema.validate(data, { abortEarly: false, context: { isPut } });
   }
 };
 

@@ -46,10 +46,25 @@ class CompanyService {
     }
   };
 
-  public getAllCompaniesDetail = async (): Promise<any> => {
+  public getAllCompaniesDetail = async (query: any): Promise<any> => {
     try {
       const pipeline: any[] = [
-        { $match: {} },
+        {
+          $match: {
+            ...(query.status && {
+              status: {
+                $regex: `^${query.status}$`,
+                $options: "i",
+              },
+            }),
+            ...(query.email && {
+              email: { $regex: query.email, $options: "i" },
+            }),
+            ...(query.name && {
+              name: { $regex: query.name, $options: "i" },
+            }),
+          },
+        },
         {
           $project: {
             createdAt: 0,
@@ -88,7 +103,7 @@ class CompanyService {
       ResponseHandlerThrow.throw(error.status, false, error.message);
     }
   };
-  
+
   public deleteCompany = async (id: string): Promise<any> => {
     try {
       const deletedCompany = await this.companyDao.deleteCompanyById(id);

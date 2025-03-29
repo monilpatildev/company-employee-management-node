@@ -25,7 +25,7 @@ class EmployeeDao {
   ): Promise<boolean> => {
     try {
       const employee = await EmployeeModel.findOneAndUpdate(
-        { email: email },
+        { email },
         { $set: { isVerified: true } },
         {
           new: true,

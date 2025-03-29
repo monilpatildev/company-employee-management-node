@@ -44,13 +44,14 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      const allCompanies = await this.companyService.getAllCompaniesDetail();
+      const allCompanies = await this.companyService.getAllCompaniesDetail(
+        request.query
+      );
       ResponseHandler.success(
         response,
         201,
-        "Fetch all companies successFully!",
-        allCompanies,
-        allCompanies.length
+        `Fetch  ${allCompanies.length} companies successFully!`,
+        allCompanies
       );
     } catch (error: any) {
       ResponseHandler.error(response, error.status, error.message);
@@ -128,7 +129,7 @@ class CompanyController {
       const foundCompany = await this.companyService.getCompanyDetail(
         request.params.id
       );
-      
+
       if (!foundCompany.length) {
         ResponseHandlerThrow.throw(400, false, "No company found!");
       }

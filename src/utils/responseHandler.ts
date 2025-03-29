@@ -2,26 +2,26 @@ import { Response } from "express";
 
 class ResponseHandler {
   static success(
-    res: Response,
+    response: Response,
     status: number,
     message: string,
     data?: any,
-    total?:number
+    total?: number
   ): Response {
-    return res.status(status).json({
+    return response.status(status).json({
       status,
       success: true,
       message,
       data,
-      total
+      total,
     });
   }
   static error(
-    res: Response,
+    response: Response,
     status: number = 500,
     message: string = "Internal server error."
   ): Response {
-    return res.status(status).json({
+    return response.status(status).json({
       status,
       success: false,
       message,
