@@ -3,7 +3,7 @@ import { Response } from "express";
 class ResponseHandler {
   static success(
     response: Response,
-    status: number,
+    status: number ,
     message: string,
     data?: any,
     total?: number

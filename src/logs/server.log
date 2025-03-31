@@ -1,3 +1,102 @@
 error: Mar-28-2025 16:44:13: 	invalid email
 error: Mar-28-2025 16:44:21: 	invalid email
 error: Mar-28-2025 16:44:44: 	invalid password
+error: Mar-31-2025 11:57:18: 	Invalid email
+error: Mar-31-2025 12:34:48: 	Invalid email
+error: Mar-31-2025 12:35:03: 	Invalid email
+error: Mar-31-2025 12:35:07: 	Invalid password
+info: Mar-31-2025 14:19:38: 	Employee authenticated successfully
+warn: Mar-31-2025 14:24:04: 	Employee authenticated successfully
+info: Mar-31-2025 14:26:37: 	Employee authenticated successfully
+info: Mar-31-2025 15:00:27: 	Employee authenticated successfully
+info: Mar-31-2025 15:00:29: 	Fetch all employees successFully!
+info: Mar-31-2025 15:00:38: 	Fetch all employees successFully!
+info: Mar-31-2025 15:00:45: 	Fetch all employees successFully!
+info: Mar-31-2025 15:00:55: 	Fetch all employees successFully!
+info: Mar-31-2025 15:01:00: 	Fetch all employees successFully!
+info: Mar-31-2025 15:01:17: 	Fetch all employees successFully!
+info: Mar-31-2025 15:01:23: 	Fetch all employees successFully!
+info: Mar-31-2025 15:01:35: 	Fetch all employees successFully!
+info: Mar-31-2025 15:02:00: 	Fetch all employees successFully!
+info: Mar-31-2025 15:02:22: 	Fetch all employees successFully!
+info: Mar-31-2025 15:03:31: 	Fetch all employees successFully!
+info: Mar-31-2025 15:03:38: 	Fetch all employees successFully!
+info: Mar-31-2025 15:04:13: 	Fetch all employees successFully!
+info: Mar-31-2025 15:04:14: 	Fetch all employees successFully!
+info: Mar-31-2025 15:04:48: 	Fetch all employees successFully!
+info: Mar-31-2025 15:04:50: 	Fetch all employees successFully!
+info: Mar-31-2025 15:09:46: 	Fetch all companies successFully!
+info: Mar-31-2025 15:09:51: 	Fetch all companies successFully!
+info: Mar-31-2025 15:10:02: 	Fetch all companies successFully!
+info: Mar-31-2025 15:10:14: 	Fetch all companies successFully!
+info: Mar-31-2025 15:10:17: 	Fetch all companies successFully!
+info: Mar-31-2025 15:10:43: 	Fetch all companies successFully!
+info: Mar-31-2025 15:11:29: 	Fetch all companies successFully!
+info: Mar-31-2025 15:12:35: 	Fetch all companies successFully!
+info: Mar-31-2025 15:13:47: 	Fetch all companies successFully!
+info: Mar-31-2025 15:15:51: 	Fetch all companies successFully!
+info: Mar-31-2025 15:15:54: 	Fetch all companies successFully!
+info: Mar-31-2025 15:16:33: 	Fetch all companies successFully!
+info: Mar-31-2025 15:16:34: 	Fetch all companies successFully!
+info: Mar-31-2025 15:16:35: 	Fetch all companies successFully!
+info: Mar-31-2025 15:16:42: 	Fetch all companies successFully!
+info: Mar-31-2025 15:17:02: 	Fetch all companies successFully!
+info: Mar-31-2025 15:17:07: 	Fetch all companies successFully!
+info: Mar-31-2025 15:17:57: 	Fetch all companies successFully!
+info: Mar-31-2025 15:17:59: 	Fetch all companies successFully!
+info: Mar-31-2025 15:19:07: 	Fetch all companies successFully!
+info: Mar-31-2025 15:19:18: 	Fetch all companies successFully!
+info: Mar-31-2025 15:19:32: 	Fetch all companies successFully!
+info: Mar-31-2025 15:28:12: 	Fetch all companies successFully!
+info: Mar-31-2025 15:28:15: 	Fetch all companies successFully!
+info: Mar-31-2025 15:28:28: 	Company updated successFully!
+info: Mar-31-2025 15:42:40: 	Employee authenticated successfully
+info: Mar-31-2025 15:42:44: 	Fetch all employees successFully!
+info: Mar-31-2025 15:42:53: 	Fetch all companies successFully!
+info: Mar-31-2025 15:47:01: 	Fetch all companies successFully!
+info: Mar-31-2025 15:47:45: 	Fetch all companies successFully!
+info: Mar-31-2025 15:48:15: 	Fetch all companies successFully!
+info: Mar-31-2025 15:49:06: 	Fetch all companies successFully!
+info: Mar-31-2025 15:52:34: 	Fetch all companies successFully!
+info: Mar-31-2025 15:56:17: 	Fetch all employees successFully!
+info: Mar-31-2025 15:56:46: 	Fetch all employees successFully!
+info: Mar-31-2025 15:58:07: 	Fetch all employees successFully!
+info: Mar-31-2025 16:01:02: 	Fetch all employees successFully!
+info: Mar-31-2025 16:06:08: 	Fetch all employees successFully!
+info: Mar-31-2025 16:09:42: 	Fetch all employees successFully!
+info: Mar-31-2025 16:39:22: 	Employee authenticated successfully
+info: Mar-31-2025 16:39:24: 	Fetch all employees successFully!
+info: Mar-31-2025 16:39:31: 	Fetch all employees successFully!
+info: Mar-31-2025 16:39:44: 	Fetch all employees successFully!
+info: Mar-31-2025 16:40:28: 	Fetch all employees successFully!
+info: Mar-31-2025 16:45:51: 	Fetch all employees successFully!
+info: Mar-31-2025 16:46:12: 	Fetch all employees successFully!
+info: Mar-31-2025 16:46:27: 	Fetch all employees successFully!
+info: Mar-31-2025 16:48:28: 	Fetch all employees successFully!
+info: Mar-31-2025 16:49:29: 	Fetch all companies successFully!
+info: Mar-31-2025 16:50:02: 	Fetch all companies successFully!
+info: Mar-31-2025 16:52:31: 	Fetch all companies successFully!
+info: Mar-31-2025 16:52:44: 	Fetch all companies successFully!
+info: Mar-31-2025 16:52:55: 	Fetch all companies successFully!
+info: Mar-31-2025 16:53:11: 	Fetch all companies successFully!
+info: Mar-31-2025 16:53:16: 	Fetch all companies successFully!
+info: Mar-31-2025 16:57:41: 	Fetch all companies successFully!
+info: Mar-31-2025 16:58:12: 	Fetch all companies successFully!
+info: Mar-31-2025 16:58:26: 	Fetch all companies successFully!
+info: Mar-31-2025 16:58:41: 	Fetch all companies successFully!
+info: Mar-31-2025 16:59:16: 	Fetch all companies successFully!
+info: Mar-31-2025 16:59:25: 	Fetch all companies successFully!
+info: Mar-31-2025 17:00:33: 	Fetch all companies successFully!
+info: Mar-31-2025 17:00:58: 	Fetch all companies successFully!
+info: Mar-31-2025 17:01:02: 	Fetch all companies successFully!
+info: Mar-31-2025 17:01:21: 	Fetch all companies successFully!
+info: Mar-31-2025 17:01:59: 	Fetch all companies successFully!
+info: Mar-31-2025 17:02:04: 	Fetch all companies successFully!
+info: Mar-31-2025 17:31:45: 	Employee authenticated successfully
+info: Mar-31-2025 17:31:49: 	Fetch all employees successFully!
+info: Mar-31-2025 17:32:08: 	Fetch all employees successFully!
+info: Mar-31-2025 17:32:35: 	Fetch all employees successFully!
+info: Mar-31-2025 17:33:08: 	Fetch all employees successFully!
+info: Mar-31-2025 17:33:46: 	Fetch all employees successFully!
+info: Mar-31-2025 17:33:47: 	Fetch all employees successFully!
+info: Mar-31-2025 17:34:24: 	Fetch all employees successFully!

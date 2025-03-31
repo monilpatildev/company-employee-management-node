@@ -47,7 +47,6 @@ const employeeSchema: Schema<IUser> = new mongoose.Schema({
   reporters: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
-    required: false,
   },
   code: {
     type: Number,

@@ -2,18 +2,25 @@ import { Request, Response } from "express";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
-} from "../../utils/responseHandler";
+} from "../../utils/responseHandler.util";
 import validateEmployee from "../employee/employee.validation";
 import EmployeeService from "../employee/employee.service";
-import EmailVerifyAndSend from "../../utils/emailVerifyAndSend";
+import EmailVerifyAndSend from "../../service/emailVerifyAndSend";
 import AuthService from "./auth.service";
 import AuthMiddleware from "../../middleware/authVerification";
 import logger from "../../utils/logger";
+import { ValidationResult } from "joi";
 
 class AuthController {
-  private employeeService = new EmployeeService();
-  private authService = new AuthService();
-  private emailVerifyAndSend = new EmailVerifyAndSend();
+  private employeeService: EmployeeService;
+  private authService: AuthService;
+  private emailVerifyAndSend: EmailVerifyAndSend;
+
+  constructor() {
+    this.authService = new AuthService();
+    this.employeeService = new EmployeeService();
+    this.emailVerifyAndSend = new EmailVerifyAndSend();
+  }
 
   public registerEmployee = async (
     request: Request,
@@ -25,7 +32,9 @@ class AuthController {
         ResponseHandler.error(response, 400, "No body found");
       }
 
-      const validationResult = await validateEmployee(request.body);
+      const validationResult: ValidationResult<any> = await validateEmployee(
+        request.body
+      );
       if (validationResult.error) {
         const errorMessages = validationResult.error.details
           .map((detail) => detail.message)
@@ -37,13 +46,15 @@ class AuthController {
         request.body
       );
       await this.emailVerifyAndSend.sendEmail(request.body.email);
+      logger.info("Employee created successfully");
       ResponseHandler.success(
         response,
         201,
-        "Employee created and mail sent successfully!",
+        "Employee created successfully!",
         newEmployee
       );
     } catch (error: any) {
+      logger.error(error.message);
       ResponseHandler.error(
         response,
         error.status || 500,
@@ -61,10 +72,11 @@ class AuthController {
       if (!token) {
         ResponseHandler.error(response, 404, "No token found");
       }
-
       await this.emailVerifyAndSend.verifyMail(token);
-      ResponseHandler.success(response, 201, "Employee verified successfully!");
+      logger.info("Employee verified successfully");
+      ResponseHandler.success(response, 200, "Employee verified successfully!");
     } catch (error: any) {
+      logger.error(error.message);
       ResponseHandler.error(
         response,
         error.status || 500,
@@ -81,17 +93,17 @@ class AuthController {
       if (!request.body) {
         ResponseHandlerThrow.throw(400, false, "No body found");
       }
-      console.log(request.body);
-
       const { email, password } = request.body;
       const data = await this.authService.authenticateEmployee(email, password);
+      logger.info("Employee authenticated successfully");
       ResponseHandler.success(
         response,
-        201,
+        200,
         "Authenticated successfully!",
         data
       );
     } catch (error: any) {
+      logger.error(error.message);
       ResponseHandler.error(
         response,
         error.status || 500,
@@ -111,6 +123,8 @@ class AuthController {
       }
 
       const data = await AuthMiddleware.createRefreshToken(refreshToken);
+      logger.info("Tokens generated successfully!");
+
       ResponseHandler.success(
         response,
         201,
@@ -118,6 +132,7 @@ class AuthController {
         data
       );
     } catch (error: any) {
+      logger.error(error.message);
       ResponseHandler.error(
         response,
         error.status || 500,

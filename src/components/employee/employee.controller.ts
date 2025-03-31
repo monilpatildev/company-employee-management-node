@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
-} from "../../utils/responseHandler";
+} from "../../utils/responseHandler.util";
 import EmployeeService from "./employee.service";
 import validateEmployee from "./employee.validation";
+import logger from "../../utils/logger";
 
 class EmployeeController {
   private employeeService: EmployeeService;
@@ -17,7 +18,10 @@ class EmployeeController {
     response: Response
   ): Promise<void> => {
     try {
-      const allEmployees = await this.employeeService.getAllEmployeesDetail(request.query);
+      const allEmployees = await this.employeeService.getAllEmployeesDetail(
+        request.query
+      );
+      logger.info("Fetch all employees successFully!");
       ResponseHandler.success(
         response,
         200,
@@ -25,7 +29,11 @@ class EmployeeController {
         allEmployees
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -48,9 +56,8 @@ class EmployeeController {
         request.body,
         request.params.id
       );
-      if (!newEmployee) {
-        ResponseHandlerThrow.throw(400, false, "No employee found!");
-      }
+      logger.info("Employee updated successFully!");
+
       ResponseHandler.success(
         response,
         200,
@@ -58,7 +65,11 @@ class EmployeeController {
         newEmployee
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -81,9 +92,8 @@ class EmployeeController {
         request.body,
         request.params.id
       );
-      if (!newEmployee) {
-        ResponseHandlerThrow.throw(400, false, "No employee found!");
-      }
+      logger.info("Employee updated successFully!");
+
       ResponseHandler.success(
         response,
         200,
@@ -91,7 +101,11 @@ class EmployeeController {
         newEmployee
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -106,9 +120,7 @@ class EmployeeController {
       const foundEmployee = await this.employeeService.getEmployeeDetail(
         request.params.id
       );
-      if (!foundEmployee.length) {
-        ResponseHandlerThrow.throw(400, false, "No employee found!");
-      }
+      logger.info("Fetch  employee successFully!");
       ResponseHandler.success(
         response,
         200,
@@ -116,7 +128,11 @@ class EmployeeController {
         foundEmployee[0]
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -128,15 +144,17 @@ class EmployeeController {
       if (!request.params.id) {
         ResponseHandlerThrow.throw(400, false, "Id required");
       }
-      const foundCompany = await this.employeeService.deleteEmployee(
+      const foundEmployee = await this.employeeService.deleteEmployee(
         request.params.id
       );
-      if (!foundCompany) {
-        ResponseHandlerThrow.throw(400, false, "No employee found!");
-      }
+      logger.info("Employee deleted successFully!");
       ResponseHandler.success(response, 200, "Employee deleted successFully!");
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 }

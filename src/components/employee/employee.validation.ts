@@ -80,11 +80,6 @@ export const validateEmployee = (
         }),
       companyId: Joi.string()
         .empty("")
-        .when("$isPut", {
-          is: true,
-          then: Joi.optional(),
-          otherwise: Joi.required(),
-        })
         .messages({
           "string.base": "companyId must be a string",
           "string.empty": "companyId cannot be empty",
@@ -112,7 +107,11 @@ export const validateEmployee = (
       }),
     });
 
-    return fullSchema.validate(data, { abortEarly: false, context: { isPut } });
+    return fullSchema.validate(data, {
+      abortEarly: false,
+      context: { isPut },
+      errors: { wrap: { label: "" } },
+    });
   }
 };
 

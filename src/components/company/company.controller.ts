@@ -3,8 +3,9 @@ import validateCompany from "./company.validation";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
-} from "../../utils/responseHandler";
+} from "../../utils/responseHandler.util";
 import CompanyService from "./company.service";
+import logger from "../../utils/logger";
 
 class CompanyController {
   private companyService: CompanyService;
@@ -21,6 +22,7 @@ class CompanyController {
         ResponseHandlerThrow.throw(400, false, "No body found");
       }
       const validateEmp = await validateCompany(request.body);
+
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
@@ -28,6 +30,8 @@ class CompanyController {
         ResponseHandlerThrow.throw(400, false, errorMessages);
       }
       const newCompany = await this.companyService.createCompany(request.body);
+      logger.info("Company created successFully!");
+
       ResponseHandler.success(
         response,
         201,
@@ -35,7 +39,11 @@ class CompanyController {
         newCompany
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -47,14 +55,20 @@ class CompanyController {
       const allCompanies = await this.companyService.getAllCompaniesDetail(
         request.query
       );
+      logger.info("Fetch all companies successFully!");
+
       ResponseHandler.success(
         response,
-        201,
+        200,
         `Fetch  ${allCompanies.length} companies successFully!`,
         allCompanies
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -77,14 +91,20 @@ class CompanyController {
         request.body,
         request.params.id
       );
+      logger.info("Company updated successFully!");
+
       ResponseHandler.success(
         response,
-        201,
+        200,
         "Company updated successFully!",
         newCompany
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -107,14 +127,19 @@ class CompanyController {
         request.body,
         request.params.id
       );
+      logger.info("Company updated successFully!");
       ResponseHandler.success(
         response,
-        201,
+        200,
         "Company updated successFully!",
         newCompany
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -129,18 +154,19 @@ class CompanyController {
       const foundCompany = await this.companyService.getCompanyDetail(
         request.params.id
       );
-
-      if (!foundCompany.length) {
-        ResponseHandlerThrow.throw(400, false, "No company found!");
-      }
+      logger.info("Fetch company successFully!");
       ResponseHandler.success(
         response,
-        201,
+        200,
         "Fetch company successFully!",
         foundCompany[0]
       );
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 
@@ -155,12 +181,15 @@ class CompanyController {
       const foundCompany = await this.companyService.deleteCompany(
         request.params.id
       );
-      if (!foundCompany) {
-        ResponseHandlerThrow.throw(400, false, "No company found!");
-      }
-      ResponseHandler.success(response, 201, "Company deleted successFully!");
+      logger.info("Company deleted successFully!");
+
+      ResponseHandler.success(response, 200, "Company deleted successFully!");
     } catch (error: any) {
-      ResponseHandler.error(response, error.status, error.message);
+      ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
     }
   };
 }

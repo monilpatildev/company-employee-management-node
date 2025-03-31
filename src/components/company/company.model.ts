@@ -14,7 +14,7 @@ export interface ICompany extends Document {
   name: string;
   email: string;
   address: Address;
-  contact: number;
+  contact: string;
   status: CompanyStatus;
 }
 
@@ -30,11 +30,12 @@ const companySchema: Schema<ICompany> = new mongoose.Schema(
       country: { type: String, required: true },
       zip: { type: String, required: true },
     },
-    contact: { type: Number, required: true },
+    contact: { type: String, required: true },
     status: {
       type: String,
       required: true,
       enum: Object.values(CompanyStatus),
+      default: CompanyStatus.INACTIVE,
     },
   },
   {

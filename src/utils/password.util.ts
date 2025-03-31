@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { config } from "dotenv";
-import { ResponseHandlerThrow } from "./responseHandler";
+import { ResponseHandlerThrow } from "./responseHandler.util";
 config();
 
 class PasswordManager {

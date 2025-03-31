@@ -7,7 +7,7 @@ authRoutes.get(
   "/account-verify/:token",
   authController.verifyEmployeeWithToken
 );
-authRoutes.get("/authenticate", authController.authenticateEmployee);
+authRoutes.post("/authenticate", authController.authenticateEmployee);
 authRoutes.get("/refresh-token", authController.generateRefreshToken);
 
 export default authRoutes;

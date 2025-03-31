@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import {
   ResponseHandler,
   ResponseHandlerThrow,
-} from "../utils/responseHandler";
+} from "../utils/responseHandler.util";
 import EmployeeDao from "../components/employee/employee.dao";
 import { NextFunction, Request, Response } from "express";
 import { Role } from "../common/enums";
@@ -23,7 +23,7 @@ class AuthMiddleware {
           email: user.email,
         },
         accessSecretKey,
-        { expiresIn: "2h" }
+        { expiresIn: "30m" }
       );
       const refreshToken = await jwt.sign(
         {
@@ -59,8 +59,7 @@ class AuthMiddleware {
   public static verifyToken(allowedRoles: Role[]) {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
-        const accessSecretKey: string | any=
-          process.env.ACCESS_SECRET_KEY;
+        const accessSecretKey: string | any = process.env.ACCESS_SECRET_KEY;
         const accessToken: string | undefined =
           request.headers.authorization?.split(" ")[1];
         if (!accessToken) {
@@ -82,22 +81,27 @@ class AuthMiddleware {
               pipeline
             );
             if (!employeeData.length) {
-              return ResponseHandlerThrow.throw(404, false, "Invalid token");
+              ResponseHandlerThrow.throw(404, false, "Invalid token");
             }
-
             const userRole = employeeData[0].role;
 
             if (!allowedRoles.includes(userRole)) {
-              return ResponseHandlerThrow.throw(
+              ResponseHandlerThrow.throw(
                 403,
                 false,
-                "You cannot access this page"
+                "You cannot access this api"
               );
             } else {
               next();
             }
           } catch (error: any) {
-            console.log("error", error);
+            if (error.name === "TokenExpiredError") {
+              ResponseHandler.error(
+                response,
+                401,
+                "Session expired,Please login again"
+              );
+            }
             ResponseHandler.error(response, 401, error.message);
           }
         }

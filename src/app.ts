@@ -6,7 +6,7 @@ import path from "path";
 
 import MongoDBConnection from "./config/dbConnection";
 import InitialRoute from "./config/routes";
-import { ResponseHandler } from "./utils/responseHandler";
+import { ResponseHandler } from "./utils/responseHandler.util";
 
 config();
 
@@ -25,21 +25,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
-app.use((err: any, request: Request, res: Response, next: NextFunction) => {
-  if (err instanceof SyntaxError && "body" in err) {
-    console.error("Bad JSON syntax:", err);
-    console.log(err);
-    
-    ResponseHandler.error(res, 400, "Invalid JSON syntax");
-  } else {
-    next();
+app.use(
+  (error: any, request: Request, response: Response, next: NextFunction) => {
+    if (error instanceof SyntaxError && "body" in error) {
+      ResponseHandler.error(response, 400, "Invalid JSON syntax");
+    } else {
+      next();
+    }
   }
-});
+);
 
-app.use((error: Error, request: Request, res: Response, next: NextFunction) => {
-  console.error("An error occurred:", error);
-  ResponseHandler.error(res, 500, error.message);
-});
+app.use(
+  (error: Error, request: Request, response: Response, next: NextFunction) => {
+    ResponseHandler.error(response, 500, error.message);
+  }
+);
 
 const server: Server = app.listen(PORT, async () => {
   MongoDBConnection.connect(MONGODB_URI);

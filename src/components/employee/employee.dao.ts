@@ -1,12 +1,11 @@
-import { ResponseHandlerThrow } from "../../utils/responseHandler";
+import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import EmployeeModel, { IUser } from "./employee.model";
 
 class EmployeeDao {
   public createEmployee = async (data: IUser): Promise<IUser> => {
     try {
       return await EmployeeModel.create(data);
-    } catch (error) {
-      console.error("Error", error);
+    } catch (error: any) {
       ResponseHandlerThrow.throw(500, false, "Internal server error");
     }
   };
@@ -14,29 +13,27 @@ class EmployeeDao {
   public getEmployeeByIdOrEmail = async (pipeline: any[]): Promise<any> => {
     try {
       return await EmployeeModel.aggregate(pipeline);
-    } catch (error) {
-      console.error("Error", error);
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(
+        400,
+        false,
+        "Invalid id or something went wrong"
+      );
     }
   };
 
   public getEmployeeByEmailAndUpdate = async (
     email: string
-  ): Promise<boolean> => {
+  ): Promise<boolean | null> => {
     try {
-      const employee = await EmployeeModel.findOneAndUpdate(
+      return await EmployeeModel.findOneAndUpdate(
         { email },
         { $set: { isVerified: true } },
         {
           new: true,
         }
       );
-      if (!employee) {
-        ResponseHandlerThrow.throw(400, false, "No employee found");
-      }
-      return true;
-    } catch (error) {
-      console.error("Error", error);
+    } catch (error: any) {
       ResponseHandlerThrow.throw(500, false, "Internal server error");
     }
   };
@@ -50,18 +47,16 @@ class EmployeeDao {
         new: true,
       });
       return updatedEmployee;
-    } catch (error) {
-      console.error("Error", error);
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(400, false, "Invalid id");
     }
   };
 
   public deleteEmployeeById = async (id: string): Promise<IUser | null> => {
     try {
       return await EmployeeModel.findByIdAndDelete(id);
-    } catch (error) {
-      console.error("Error", error);
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    } catch (error: any) {
+      ResponseHandlerThrow.throw(400, false, "Invalid id");
     }
   };
 }

@@ -153,6 +153,7 @@ const validateCompany = (data: ICompany, isPatch: boolean = false) => {
   return validateSchema.validate(data, {
     abortEarly: false,
     context: { isPatch },
+    errors: { wrap: { label: "" } },
   });
 };
 

@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
-import passwordManager from "../../utils/passwordManager";
-import { ResponseHandlerThrow } from "../../utils/responseHandler";
+import passwordManager from "../../utils/password.util";
+import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import EmployeeDao from "./employee.dao";
 import { IUser } from "./employee.model";
 import { pipeline } from "stream";
+import addToPipeline from "../../service/pipeline.service";
 
 class EmployeeService {
   private employeeDao: EmployeeDao;
@@ -54,10 +55,21 @@ class EmployeeService {
     id: string
   ): Promise<any> => {
     try {
+      const pipeline: any[] = [{ $match: { email: employeeData.email } }];
+
+      const foundEmail = await this.employeeDao.getEmployeeByIdOrEmail(
+        pipeline
+      );
+      if (foundEmail.length) {
+        ResponseHandlerThrow.throw(400, false, "Email already used");
+      }
       const updatedEmployee = await this.employeeDao.updateEmployeeById(
         employeeData,
         id
       );
+      if (!updatedEmployee) {
+        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+      }
       return updatedEmployee;
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
@@ -87,7 +99,9 @@ class EmployeeService {
       ];
       const employeeDetails: IUser[] =
         await this.employeeDao.getEmployeeByIdOrEmail(pipeline);
-
+      if (!employeeDetails.length) {
+        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+      }
       return employeeDetails;
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
@@ -97,6 +111,9 @@ class EmployeeService {
   public deleteEmployee = async (id: string): Promise<any> => {
     try {
       const deleteEmployee = await this.employeeDao.deleteEmployeeById(id);
+      if (!deleteEmployee) {
+        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+      }
       return deleteEmployee;
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
@@ -105,9 +122,16 @@ class EmployeeService {
 
   public getAllEmployeesDetail = async (query: any): Promise<any> => {
     try {
-      const pipeline: any[] = [
+      const pipeline: any[] = [];
+
+      const queryArray = [query.designation, query.email, query.name];
+      const fieldsArray = ["designation", "email", "firstName"];
+
+      pipeline.push(addToPipeline(queryArray, fieldsArray));
+
+      pipeline.push(
         {
-          $match: { email: { $ne: "admin@gmail.com" } },
+          $match: { role: { $ne: "ADMIN" } },
         },
         {
           $lookup: {
@@ -137,46 +161,18 @@ class EmployeeService {
           $project: {
             __v: 0,
             companyId: 0,
+            role: 0,
           },
-        },
-        {
-          $match: {},
-        },
-      ];
+        }
+      );
 
-      if (query.designation) {
-        pipeline.push({
-          $match: {
-            designation: { $regex: query.designation, $options: "i" },
-          },
-        });
-      }
-      if (query.email) {
-        pipeline.push({
-          $match: {
-            email: { $regex: query.email, $options: "i" },
-          },
-        });
-      }
-      if (query.name) {
-        pipeline.push({
-          $match: {
-            firstName: { $regex: query.name, $options: "i" },
-          },
-        });
-      }
       if (query.company) {
         pipeline.push({
-          $match: {
-            company: { $regex: query.company, $options: "i" },
-          },
+          $match: { company: { $regex: query.company, $options: "i" } },
         });
       }
 
-      const employeeDetails: IUser[] =
-        await this.employeeDao.getEmployeeByIdOrEmail(pipeline);
-
-      return employeeDetails;
+      return this.employeeDao.getEmployeeByIdOrEmail(pipeline);
     } catch (error: any) {
       ResponseHandlerThrow.throw(error.status, false, error.message);
     }

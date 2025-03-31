@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
-import { ResponseHandlerThrow } from "./responseHandler";
-import TokenEncryptDecrypt from "./tokenEncryptionDecryption";
+import { ResponseHandlerThrow } from "../utils/responseHandler.util";
+import TokenEncryptDecrypt from "../utils/tokenEncryptionDecryption.util";
 import EmployeeDao from "../components/employee/employee.dao";
 import ejs from "ejs";
 import path from "path";
@@ -56,7 +56,11 @@ class EmailVerifyAndSend {
       if (employee[0].isVerified === true) {
         ResponseHandlerThrow.throw(400, false, "Employee already verified");
       } else {
-        await this.employeeDao.getEmployeeByEmailAndUpdate(decryptedEmail);
+        const verifiedEmployee =
+          await this.employeeDao.getEmployeeByEmailAndUpdate(decryptedEmail);
+        if (!verifiedEmployee) {
+          ResponseHandlerThrow.throw(400, false, "Employee not found");
+        }
         return true;
       }
     } catch (error: any) {

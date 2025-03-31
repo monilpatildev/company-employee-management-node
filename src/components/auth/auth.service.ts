@@ -1,7 +1,7 @@
 import AuthMiddleware from "../../middleware/authVerification";
 import logger from "../../utils/logger";
-import passwordManager from "../../utils/passwordManager";
-import { ResponseHandlerThrow } from "../../utils/responseHandler";
+import passwordManager from "../../utils/password.util";
+import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import EmployeeDao from "../employee/employee.dao";
 
 class AuthService {
