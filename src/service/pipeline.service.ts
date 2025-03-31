@@ -2,6 +2,7 @@ const addToPipeline = (
   queries: (string | undefined)[],
   fieldsArray: string[]
 ): object => {
+  
   const conditions = queries.reduce((acc, query, index) => {
     if (query) {
       if (fieldsArray[index] === "status") {

@@ -14,17 +14,12 @@ export const validateEmployee = (
         "string.empty": "companyId cannot be empty",
         "any.required": "companyId is required",
       }),
-      firstName: Joi.forbidden(),
-      lastName: Joi.forbidden(),
-      email: Joi.forbidden(),
-      password: Joi.forbidden(),
-      designation: Joi.forbidden(),
-      isVerified: Joi.forbidden(),
-      reporters: Joi.forbidden(),
-      code: Joi.forbidden(),
-    }).unknown(false);
+    });
 
-    return patchSchema.validate(data, { abortEarly: false });
+    return patchSchema.validate(data, {
+      abortEarly: false,
+      errors: { wrap: { label: "" } },
+    });
   } else {
     const fullSchema = Joi.object({
       firstName: Joi.string()
@@ -78,13 +73,11 @@ export const validateEmployee = (
           "string.empty": "password cannot be empty",
           "any.required": "password is required",
         }),
-      companyId: Joi.string()
-        .empty("")
-        .messages({
-          "string.base": "companyId must be a string",
-          "string.empty": "companyId cannot be empty",
-          "any.required": "companyId is required",
-        }),
+      companyId: Joi.string().empty("").messages({
+        "string.base": "companyId must be a string",
+        "string.empty": "companyId cannot be empty",
+        "any.required": "companyId is required",
+      }),
       designation: Joi.string()
         .empty("")
         .valid(...Object.values(Designation))
