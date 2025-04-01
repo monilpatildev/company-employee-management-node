@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
+import { ResponseHandler } from "../../utils/responseHandler.util";
 import {
-  ResponseHandler,
-  ResponseHandlerThrow,
-} from "../../utils/responseHandler.util";
-import validateEmployee from "../employee/employee.validation";
+  validateEmployee,
+  validateEmailPassword,
+} from "../employee/employee.validation";
 import EmployeeService from "../employee/employee.service";
 import EmailVerifyAndSend from "../../service/emailVerifyAndSend";
 import AuthService from "./auth.service";
@@ -39,13 +39,13 @@ class AuthController {
         const errorMessages = validationResult.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(404, false, errorMessages);
+        ResponseHandler.error(response, 400, errorMessages);
       }
 
       const newEmployee = await this.employeeService.createEmployee(
         request.body
       );
-      await this.emailVerifyAndSend.sendEmail(request.body.email);
+
       logger.info("Employee created successfully");
       ResponseHandler.success(
         response,
@@ -70,7 +70,7 @@ class AuthController {
     try {
       const { token } = request.params;
       if (!token) {
-        ResponseHandler.error(response, 404, "No token found");
+        ResponseHandler.error(response, 400, "No token found");
       }
       await this.emailVerifyAndSend.verifyMail(token);
       logger.info("Employee verified successfully");
@@ -90,9 +90,15 @@ class AuthController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body) {
-        ResponseHandlerThrow.throw(400, false, "No body found");
+      const validationResult: ValidationResult<any> =
+        await validateEmailPassword(request.body);
+      if (validationResult.error) {
+        const errorMessages = validationResult.error.details
+          .map((detail) => detail.message)
+          .join(", ");
+        throw { status: 400, message: errorMessages };
       }
+
       const { email, password } = request.body;
       const data = await this.authService.authenticateEmployee(email, password);
       logger.info("Employee authenticated successfully");
@@ -119,10 +125,10 @@ class AuthController {
     try {
       const { refreshToken } = request.body;
       if (!refreshToken) {
-        ResponseHandlerThrow.throw(400, false, "No token found");
+        ResponseHandler.error(response, 400, "No token found");
       }
 
-      const data = await AuthMiddleware.createRefreshToken(refreshToken);
+      const data = await this.authService.GenerateRefreshToken(refreshToken);
       logger.info("Tokens generated successfully!");
 
       ResponseHandler.success(

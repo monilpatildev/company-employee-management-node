@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import { isObjectIdOrHexString, Types } from "mongoose";
 import passwordManager from "../../utils/password.util";
-import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import CompanyDao from "./company.dao";
 import { ICompany } from "./company.model";
 import addToPipeline from "../../service/pipeline.service";
+import { findCompany } from "../../service/findEmpOrCom.service";
 class CompanyService {
   private companyDao: CompanyDao;
 
@@ -13,24 +13,31 @@ class CompanyService {
 
   public createCompany = async (companyData: ICompany): Promise<any> => {
     try {
-      const pipeline: any[] = [{ $match: { email: companyData.email } }];
+      const pipeline: any[] = [
+        {
+          $match: {
+            email: companyData.email,
+            name: companyData.name,
+          },
+        },
+      ];
+
       const existCompany: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
       if (existCompany.length) {
-        ResponseHandlerThrow.throw(
-          400,
-          false,
-          "Company is already exist with this email!"
-        );
+        throw {
+          status: 400,
+          message: "Company is already exist with this email or name!",
+        };
       }
 
       const createCompany = await this.companyDao.createCompany(companyData);
       if (!createCompany) {
-        ResponseHandlerThrow.throw(500, false, "Internal server error");
+        throw { status: 500, message: "Internal server error" };
       }
       return createCompany;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
@@ -39,28 +46,39 @@ class CompanyService {
     id: string
   ): Promise<any> => {
     try {
-      const pipeline: any[] = [{ $match: { email: companyData.email } }];
-      const isEmailExist: ICompany[] =
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid company id" };
+      }
+      await findCompany(id);
+      const pipeline: any[] = [
+        {
+          $match: {
+            email: companyData.email,
+            name: companyData.name,
+          },
+        },
+      ];
+      const isEmailOrNameExist: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
-      if (isEmailExist.length) {
-        ResponseHandlerThrow.throw(400, false, "Email already used");
+      if (isEmailOrNameExist.length) {
+        throw { status: 400, message: "Email or name already used" };
       }
       const updatedCompany = await this.companyDao.updateCompanyById(
         companyData,
         id
       );
       if (!updatedCompany) {
-        ResponseHandlerThrow.throw(400, false, "Company not found");
+        throw { status: 400, message: "Company not found" };
       }
       return updatedCompany;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
   public getAllCompaniesDetail = async (query: any): Promise<any> => {
     try {
-      const pipeline: any[] = [{ $match: {} }];
+      const pipeline: any[] = [];
       const queryArray = [query.email, query.name, query.status];
       const fieldsArray = ["email", "name", "status"];
 
@@ -71,20 +89,24 @@ class CompanyService {
           createdAt: 0,
           updatedAt: 0,
           __v: 0,
+          isDeleted: 0,
         },
       });
-      console.log(pipeline);
 
       return await this.companyDao.getCompanyByIdOrEmail(pipeline);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
   public getCompanyDetail = async (id: string): Promise<any> => {
     try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid company id" };
+      }
+      await findCompany(id);
       const pipeline: any[] = [
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        { $match: { _id: new Types.ObjectId(id), isDeleted: false } },
         {
           $project: {
             createdAt: 0,
@@ -96,23 +118,27 @@ class CompanyService {
       const companyDetails: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
       if (!companyDetails.length) {
-        ResponseHandlerThrow.throw(400, false, "No company found!");
+        throw { status: 400, message: "No company found!" };
       }
       return companyDetails;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
   public deleteCompany = async (id: string): Promise<any> => {
     try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid company id" };
+      }
+      await findCompany(id);
       const deletedCompany = await this.companyDao.deleteCompanyById(id);
       if (!deletedCompany) {
-        ResponseHandlerThrow.throw(400, false, "No company found!");
+        throw { status: 400, message: "No company found!" };
       }
       return deletedCompany;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 }

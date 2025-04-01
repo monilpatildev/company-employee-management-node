@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
-import {
-  ResponseHandler,
-  ResponseHandlerThrow,
-} from "../../utils/responseHandler.util";
+import { ResponseHandler } from "../../utils/responseHandler.util";
 import EmployeeService from "./employee.service";
-import validateEmployee from "./employee.validation";
+import { validateEmployee } from "./employee.validation";
 import logger from "../../utils/logger";
 
 class EmployeeController {
@@ -42,15 +39,12 @@ class EmployeeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body && !request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "No body or id found");
-      }
       const validateEmp = await validateEmployee(request.body, false, true);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(400, false, errorMessages);
+        throw { status: 400, message: errorMessages };
       }
       const newEmployee = await this.employeeService.updateFullEmployeeDetails(
         request.body,
@@ -78,18 +72,15 @@ class EmployeeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body && !request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "No body or id found");
-      }
       const validateEmp = await validateEmployee(request.body, true, false);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(400, false, errorMessages);
+        throw { status: 400, message: errorMessages };
       }
-      const newEmployee = await this.employeeService.updateFullEmployeeDetails(
-        request.body,
+      const newEmployee = await this.employeeService.modifyEmployeeDetails(
+        request.body.companyId,
         request.params.id
       );
       logger.info("Employee updated successFully!");
@@ -114,9 +105,6 @@ class EmployeeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "Id required");
-      }
       const foundEmployee = await this.employeeService.getEmployeeDetail(
         request.params.id
       );
@@ -141,9 +129,6 @@ class EmployeeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "Id required");
-      }
       const foundEmployee = await this.employeeService.deleteEmployee(
         request.params.id
       );

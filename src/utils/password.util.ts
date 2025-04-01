@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { config } from "dotenv";
-import { ResponseHandlerThrow } from "./responseHandler.util";
+
 config();
 
 class PasswordManager {
@@ -11,8 +11,11 @@ class PasswordManager {
         .pbkdf2Sync(password, salt, 1000, 16, `sha512`)
         .toString(`hex`);
       return hashedPassword;
-    } catch (error) {
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    } catch (error: any) {
+      throw {
+        status: error.status || 400,
+        message: error.message || "Internal server error",
+      };
     }
   }
 
@@ -29,8 +32,11 @@ class PasswordManager {
         return false;
       }
       return true;
-    } catch (error) {
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+    } catch (error: any) {
+      throw {
+        status: error.status || 400,
+        message: error.message || "Internal server error",
+      };
     }
   }
 }

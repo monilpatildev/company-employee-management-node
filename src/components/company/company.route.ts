@@ -7,32 +7,32 @@ const companyRoutes = Router();
 
 companyRoutes.post(
   "/",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.registerCompany
 );
 companyRoutes.get(
   "/",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.getAllCompanies
 );
 companyRoutes.put(
   "/:id",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.updateCompany
 );
 companyRoutes.patch(
   "/:id",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.modifyCompany
 );
 companyRoutes.get(
   "/:id",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.getCompany
 );
 companyRoutes.delete(
   "/:id",
-  AuthMiddleware.verifyToken([Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.deleteCompany
 );
 

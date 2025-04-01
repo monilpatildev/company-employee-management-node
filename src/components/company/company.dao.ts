@@ -1,4 +1,3 @@
-import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import CompanyModel, { ICompany } from "./company.model";
 
 class CompanyDao {
@@ -6,7 +5,7 @@ class CompanyDao {
     try {
       return await CompanyModel.create(data);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+      throw { status: 400, message: "Internal server error" };
     }
   };
 
@@ -14,19 +13,19 @@ class CompanyDao {
     try {
       return await CompanyModel.aggregate(pipeline);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(
-        400,
-        false,
-        "Invalid id or something went wrong"
-      );
+      throw { status: 400, message: "Internal server error" };
     }
   };
 
   public deleteCompanyById = async (id: string): Promise<ICompany | null> => {
     try {
-      return await CompanyModel.findByIdAndDelete(id);
+      return await CompanyModel.findByIdAndUpdate(
+        id,
+        { $set: { isDeleted: true } },
+        { new: true }
+      );
     } catch (error: any) {
-      ResponseHandlerThrow.throw(400, false, "Invalid id");
+      throw { status: 400, message: "Internal server error" };
     }
   };
 
@@ -37,7 +36,7 @@ class CompanyDao {
     try {
       return await CompanyModel.findByIdAndUpdate(id, data, { new: true });
     } catch (error: any) {
-      ResponseHandlerThrow.throw(400, false, "Invalid id");
+      throw { status: 400, message: "Internal server error" };
     }
   };
 }

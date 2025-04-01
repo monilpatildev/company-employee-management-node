@@ -7,27 +7,27 @@ const employeeRoutes = Router();
 
 employeeRoutes.get(
   "/",
-  AuthMiddleware.verifyToken([Role.USER, Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.getAllEmployees
 );
 employeeRoutes.put(
   "/:id",
-  AuthMiddleware.verifyToken([Role.USER, Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.updateEmployee
 );
 employeeRoutes.patch(
   "/:id",
-  AuthMiddleware.verifyToken([Role.USER, Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.modifyEmployee
 );
 employeeRoutes.get(
   "/:id",
-  AuthMiddleware.verifyToken([Role.USER, Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.getEmployee
 );
 employeeRoutes.delete(
   "/:id",
-  AuthMiddleware.verifyToken([Role.USER, Role.ADMIN]),
+  AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.deleteEmployee
 );
 

@@ -1,4 +1,3 @@
-import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import EmployeeModel, { IUser } from "./employee.model";
 
 class EmployeeDao {
@@ -6,7 +5,7 @@ class EmployeeDao {
     try {
       return await EmployeeModel.create(data);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+      throw error;
     }
   };
 
@@ -14,11 +13,7 @@ class EmployeeDao {
     try {
       return await EmployeeModel.aggregate(pipeline);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(
-        400,
-        false,
-        "Invalid id or something went wrong"
-      );
+      throw error;
     }
   };
 
@@ -34,7 +29,7 @@ class EmployeeDao {
         }
       );
     } catch (error: any) {
-      ResponseHandlerThrow.throw(500, false, "Internal server error");
+      throw error;
     }
   };
 
@@ -48,15 +43,19 @@ class EmployeeDao {
       });
       return updatedEmployee;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(400, false, "Invalid id");
+      throw error;
     }
   };
 
   public deleteEmployeeById = async (id: string): Promise<IUser | null> => {
     try {
-      return await EmployeeModel.findByIdAndDelete(id);
+      return await EmployeeModel.findByIdAndUpdate(
+        id,
+        { $set: { isDeleted: false } },
+        { new: true }
+      );
     } catch (error: any) {
-      ResponseHandlerThrow.throw(400, false, "Invalid id");
+      throw error;
     }
   };
 }

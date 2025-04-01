@@ -101,3 +101,73 @@ info: Mar-31-2025 17:33:46: 	Fetch all employees successFully!
 info: Mar-31-2025 17:33:47: 	Fetch all employees successFully!
 info: Mar-31-2025 17:34:24: 	Fetch all employees successFully!
 info: Mar-31-2025 18:09:18: 	Employee authenticated successfully
+info: Apr-01-2025 10:29:47: 	Employee authenticated successfully
+info: Apr-01-2025 10:45:13: 	Employee updated successFully!
+info: Apr-01-2025 10:45:17: 	Employee updated successFully!
+error: Apr-01-2025 12:00:55: 	Email is already used
+error: Apr-01-2025 12:01:46: 	Email is already used
+error: Apr-01-2025 12:03:49: 	Email is already used
+error: Apr-01-2025 12:05:15: 	Email is already used
+error: Apr-01-2025 12:08:41: 	Email is already used
+error: Apr-01-2025 12:09:42: 	Email is already used
+error: Apr-01-2025 12:10:27: 	Email is already used
+error: Apr-01-2025 12:10:44: 	Email is already used
+error: Apr-01-2025 12:11:26: 	Email is already used
+error: Apr-01-2025 14:09:29: 	Email is already used
+error: Apr-01-2025 14:10:15: 	Email is already used
+info: Apr-01-2025 14:10:18: 	Employee authenticated successfully
+error: Apr-01-2025 14:10:23: 	Invalid password
+error: Apr-01-2025 14:10:23: 	Invalid email or password
+info: Apr-01-2025 14:11:57: 	Fetch all employees successFully!
+info: Apr-01-2025 14:12:20: 	Fetch all employees successFully!
+info: Apr-01-2025 14:12:32: 	Fetch all companies successFully!
+info: Apr-01-2025 14:12:38: 	Fetch all companies successFully!
+info: Apr-01-2025 14:18:55: 	Fetch all companies successFully!
+info: Apr-01-2025 14:19:03: 	Fetch all companies successFully!
+error: Apr-01-2025 15:20:31: 	Invalid password
+error: Apr-01-2025 15:21:21: 	Invalid email
+error: Apr-01-2025 15:21:54: 	Email and password required
+error: Apr-01-2025 15:22:05: 	Email and password required
+error: Apr-01-2025 15:23:02: 	email must be a valid email
+info: Apr-01-2025 15:24:17: 	Employee created successfully
+info: Apr-01-2025 15:24:47: 	Employee verified successfully
+error: Apr-01-2025 15:24:52: 	Employee already verified
+error: Apr-01-2025 15:25:03: 	Email is already used
+error: Apr-01-2025 15:40:26: 	email must be a valid email
+info: Apr-01-2025 15:40:33: 	Employee authenticated successfully
+info: Apr-01-2025 16:47:45: 	Employee authenticated successfully
+info: Apr-01-2025 16:47:52: 	Employee updated successFully!
+info: Apr-01-2025 17:06:15: 	Employee created successfully
+info: Apr-01-2025 17:06:25: 	Employee deleted successFully!
+info: Apr-01-2025 17:07:45: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:11: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:19: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:27: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:36: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:44: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:51: 	Employee deleted successFully!
+info: Apr-01-2025 17:09:59: 	Employee deleted successFully!
+info: Apr-01-2025 17:10:07: 	Employee deleted successFully!
+info: Apr-01-2025 17:10:15: 	Employee deleted successFully!
+info: Apr-01-2025 17:10:22: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:07: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:17: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:25: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:32: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:39: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:45: 	Employee deleted successFully!
+info: Apr-01-2025 17:11:53: 	Employee deleted successFully!
+info: Apr-01-2025 17:12:26: 	Company deleted successFully!
+info: Apr-01-2025 17:12:38: 	Company deleted successFully!
+info: Apr-01-2025 17:17:02: 	Fetch all companies successFully!
+info: Apr-01-2025 17:17:07: 	Fetch all companies successFully!
+info: Apr-01-2025 17:17:42: 	Fetch all employees successFully!
+info: Apr-01-2025 17:33:58: 	Employee authenticated successfully
+info: Apr-01-2025 17:34:27: 	Fetch  employee successFully!
+info: Apr-01-2025 17:37:26: 	Employee deleted successFully!
+info: Apr-01-2025 17:37:58: 	Employee deleted successFully!
+info: Apr-01-2025 17:38:00: 	Employee deleted successFully!
+info: Apr-01-2025 17:38:31: 	Employee deleted successFully!
+error: Apr-01-2025 18:06:43: 	Email is already used
+info: Apr-01-2025 18:06:57: 	Employee created successfully
+info: Apr-01-2025 18:08:14: 	Employee authenticated successfully

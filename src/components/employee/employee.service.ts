@@ -1,39 +1,33 @@
-import mongoose from "mongoose";
 import passwordManager from "../../utils/password.util";
-import { ResponseHandlerThrow } from "../../utils/responseHandler.util";
 import EmployeeDao from "./employee.dao";
 import { IUser } from "./employee.model";
 import { pipeline } from "stream";
 import addToPipeline from "../../service/pipeline.service";
+import CompanyDao from "../company/company.dao";
+import { findEmployee } from "../../service/findEmpOrCom.service";
+import { isObjectIdOrHexString, Types } from "mongoose";
+import EmailVerifyAndSend from "../../service/emailVerifyAndSend";
 
 class EmployeeService {
   private employeeDao: EmployeeDao;
+  private companyDao: CompanyDao;
+  private emailVerifyAndSend: EmailVerifyAndSend;
 
   constructor() {
     this.employeeDao = new EmployeeDao();
+    this.companyDao = new CompanyDao();
+    this.emailVerifyAndSend = new EmailVerifyAndSend();
   }
 
   public createEmployee = async (employeeData: IUser): Promise<any> => {
     try {
-      const pipeline: any[] = [
-        { $match: { email: employeeData.email } },
-        {
-          $project: {
-            password: 0,
-            __v: 0,
-          },
-        },
-      ];
+      const pipeline: any[] = [{ $match: { email: employeeData.email } }];
 
       const existEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
         pipeline
       );
       if (existEmployee.length) {
-        ResponseHandlerThrow.throw(
-          400,
-          false,
-          "Employee is already exist with this email!"
-        );
+        throw { status: 400, message: "Email is already used" };
       }
       const { firstName, lastName, email, password } = employeeData;
       const hashedPassword = await passwordManager.hashPassword(password);
@@ -44,9 +38,10 @@ class EmployeeService {
         password: hashedPassword,
       };
       const createEmployee = await this.employeeDao.createEmployee(employee);
+      await this.emailVerifyAndSend.sendEmail(email);
       return createEmployee;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
@@ -55,31 +50,71 @@ class EmployeeService {
     id: string
   ): Promise<any> => {
     try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid employee id" };
+      }
+      await findEmployee(id);
       const pipeline: any[] = [{ $match: { email: employeeData.email } }];
-
       const foundEmail = await this.employeeDao.getEmployeeByIdOrEmail(
         pipeline
       );
       if (foundEmail.length) {
-        ResponseHandlerThrow.throw(400, false, "Email already used");
+        throw { status: 400, message: "Email already used" };
       }
       const updatedEmployee = await this.employeeDao.updateEmployeeById(
         employeeData,
         id
       );
       if (!updatedEmployee) {
-        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+        throw { status: 500, message: "Internal server error" };
       }
       return updatedEmployee;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
+    }
+  };
+
+  public modifyEmployeeDetails = async (
+    companyId: any,
+    id: string
+  ): Promise<any> => {
+    try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid employee id" };
+      }
+      await findEmployee(id);
+      const companyPipeline: any[] = [
+        { $match: { _id: new Types.ObjectId(companyId) } },
+      ];
+
+      const foundCompany = await this.companyDao.getCompanyByIdOrEmail(
+        companyPipeline
+      );
+
+      if (!foundCompany.length) {
+        throw { status: 400, message: "Company not found!" };
+      }
+      const updatedEmployee = await this.employeeDao.updateEmployeeById(
+        companyId,
+        id
+      );
+      if (!updatedEmployee) {
+        throw { status: 500, message: "Internal server error" };
+      }
+      return updatedEmployee;
+    } catch (error: any) {
+      throw error;
     }
   };
 
   public getEmployeeDetail = async (id: string): Promise<any> => {
     try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid employee id" };
+      }
+      await findEmployee(id);
       const pipeline: any[] = [
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        { $match: { _id: new Types.ObjectId(id), isDeleted: false } },
         {
           $project: {
             createdAt: 0,
@@ -100,23 +135,27 @@ class EmployeeService {
       const employeeDetails: IUser[] =
         await this.employeeDao.getEmployeeByIdOrEmail(pipeline);
       if (!employeeDetails.length) {
-        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+        throw { status: 400, message: "Employee not found!" };
       }
       return employeeDetails;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
   public deleteEmployee = async (id: string): Promise<any> => {
     try {
+      if (!isObjectIdOrHexString(id)) {
+        throw { status: 400, message: "Invalid employee id" };
+      }
+      await findEmployee(id);
       const deleteEmployee = await this.employeeDao.deleteEmployeeById(id);
       if (!deleteEmployee) {
-        ResponseHandlerThrow.throw(400, false, "Employee not found!");
+        throw { status: 500, message: "Internal server error" };
       }
       return deleteEmployee;
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 
@@ -162,6 +201,7 @@ class EmployeeService {
             __v: 0,
             companyId: 0,
             role: 0,
+            isDeleted: 0,
           },
         }
       );
@@ -174,7 +214,7 @@ class EmployeeService {
 
       return this.employeeDao.getEmployeeByIdOrEmail(pipeline);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 }

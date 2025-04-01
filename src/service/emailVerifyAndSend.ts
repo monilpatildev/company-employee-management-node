@@ -1,21 +1,19 @@
 import nodemailer from "nodemailer";
-import { ResponseHandlerThrow } from "../utils/responseHandler.util";
 import TokenEncryptDecrypt from "../utils/tokenEncryptionDecryption.util";
 import EmployeeDao from "../components/employee/employee.dao";
 import ejs from "ejs";
 import path from "path";
 
 class EmailVerifyAndSend {
-  private appPassword: any;
   private employeeDao: EmployeeDao;
 
   constructor() {
-    this.appPassword = process.env.CLIENT_SECRET;
     this.employeeDao = new EmployeeDao();
   }
 
   public sendEmail = async (email: string): Promise<void> => {
     try {
+      const appPassword = process.env.CLIENT_SECRET;
       const token = await TokenEncryptDecrypt.encryptToken(email);
       const verificationLink = `${process.env.SERVER_BASE_URL}/api/account-verify/${token}`;
 
@@ -26,7 +24,7 @@ class EmailVerifyAndSend {
         service: "gmail",
         auth: {
           user: "monilp.webosmotic@gmail.com",
-          pass: this.appPassword,
+          pass: appPassword,
         },
       });
       const mailOptions = {
@@ -39,7 +37,10 @@ class EmailVerifyAndSend {
 
       const result = await transport.sendMail(mailOptions);
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw {
+        status: error.status || 400,
+        message: error.message || "Invalid token",
+      };
     }
   };
 
@@ -47,24 +48,27 @@ class EmailVerifyAndSend {
     try {
       const decryptedEmail = await TokenEncryptDecrypt.decryptToken(token);
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       if (!emailRegex.test(decryptedEmail)) {
-        ResponseHandlerThrow.throw(400, false, "Invalid token");
+        throw { status: 400, message: "Invalid token" };
       }
+
       const employee = await this.employeeDao.getEmployeeByIdOrEmail([
         { $match: { email: decryptedEmail } },
       ]);
+
       if (employee[0].isVerified === true) {
-        ResponseHandlerThrow.throw(400, false, "Employee already verified");
+        throw { status: 400, message: "Employee already verified" };
       } else {
         const verifiedEmployee =
           await this.employeeDao.getEmployeeByEmailAndUpdate(decryptedEmail);
         if (!verifiedEmployee) {
-          ResponseHandlerThrow.throw(400, false, "Employee not found");
+          throw { status: 400, message: "Employee not found" };
         }
         return true;
       }
     } catch (error: any) {
-      ResponseHandlerThrow.throw(error.status, false, error.message);
+      throw error;
     }
   };
 }

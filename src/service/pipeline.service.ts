@@ -2,8 +2,10 @@ const addToPipeline = (
   queries: (string | undefined)[],
   fieldsArray: string[]
 ): object => {
-  
   const conditions = queries.reduce((acc, query, index) => {
+    acc.push({
+      isDeleted: false,
+    });
     if (query) {
       if (fieldsArray[index] === "status") {
         acc.push({
@@ -22,8 +24,7 @@ const addToPipeline = (
   if (conditions.length === 0) {
     return { $match: {} };
   }
-  console.log(conditions);
-  
+
   return { $match: { $or: conditions } };
 };
 

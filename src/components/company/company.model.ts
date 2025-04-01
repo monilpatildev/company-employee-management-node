@@ -16,6 +16,7 @@ export interface ICompany extends Document {
   address: Address;
   contact: string;
   status: CompanyStatus;
+  isDeleted: boolean;
 }
 
 const companySchema: Schema<ICompany> = new mongoose.Schema(
@@ -37,6 +38,7 @@ const companySchema: Schema<ICompany> = new mongoose.Schema(
       enum: Object.values(CompanyStatus),
       default: CompanyStatus.INACTIVE,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,

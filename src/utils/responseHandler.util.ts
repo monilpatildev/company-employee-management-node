@@ -6,14 +6,12 @@ class ResponseHandler {
     status: number ,
     message: string,
     data?: any,
-    total?: number
   ): Response {
     return response.status(status).json({
       status,
       success: true,
       message,
       data,
-      total,
     });
   }
   static error(
@@ -29,14 +27,5 @@ class ResponseHandler {
   }
 }
 
-class ResponseHandlerThrow {
-  static throw(status: number, success: boolean, message: string): never {
-    throw {
-      status,
-      success,
-      message,
-    };
-  }
-}
 
-export { ResponseHandler, ResponseHandlerThrow };
+export { ResponseHandler };

@@ -12,6 +12,7 @@ export interface IUser extends Document {
   reporters: Types.ObjectId;
   code: number;
   role: Role;
+  isDeleted: boolean;
 }
 
 const employeeSchema: Schema<IUser> = new mongoose.Schema({
@@ -56,6 +57,7 @@ const employeeSchema: Schema<IUser> = new mongoose.Schema({
     enum: Object.values(Role),
     default: Role.USER,
   },
+  isDeleted: { type: Boolean, default: false },
 });
 
 const EmployeeModel: Model<IUser> = mongoose.model<IUser>(

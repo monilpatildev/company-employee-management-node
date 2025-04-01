@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import validateCompany from "./company.validation";
-import {
-  ResponseHandler,
-  ResponseHandlerThrow,
-} from "../../utils/responseHandler.util";
+import { ResponseHandler } from "../../utils/responseHandler.util";
 import CompanyService from "./company.service";
 import logger from "../../utils/logger";
 
@@ -18,16 +15,12 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body) {
-        ResponseHandlerThrow.throw(400, false, "No body found");
-      }
       const validateEmp = await validateCompany(request.body);
-
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(400, false, errorMessages);
+        throw { status: 400, message: errorMessages };
       }
       const newCompany = await this.companyService.createCompany(request.body);
       logger.info("Company created successFully!");
@@ -77,15 +70,12 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body && !request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "No body or id found");
-      }
       const validateEmp = await validateCompany(request.body);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(400, false, errorMessages);
+        throw { status: 400, message: errorMessages };
       }
       const newCompany = await this.companyService.updateFullCompany(
         request.body,
@@ -113,15 +103,12 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.body && !request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "No body or id found");
-      }
       const validateEmp = await validateCompany(request.body, true);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandlerThrow.throw(400, false, errorMessages);
+        throw { status: 400, message: errorMessages };
       }
       const newCompany = await this.companyService.updateFullCompany(
         request.body,
@@ -148,9 +135,8 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "Id required");
-      }
+   
+      
       const foundCompany = await this.companyService.getCompanyDetail(
         request.params.id
       );
@@ -175,9 +161,6 @@ class CompanyController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.params.id) {
-        ResponseHandlerThrow.throw(400, false, "Id required");
-      }
       const foundCompany = await this.companyService.deleteCompany(
         request.params.id
       );
