@@ -10,16 +10,17 @@ class AuthMiddleware {
   private static employeeDao = new EmployeeDao();
 
   public static authenticate(allowedRoles: Role[]) {
-    return async (request: Request, response: Response, next: NextFunction) => {
+    return async (
+      request: Request,
+      response: Response,
+      next: NextFunction
+    ): Promise<any> => {
       try {
         const accessSecretKey: string | any = process.env.ACCESS_SECRET_KEY;
         const accessToken: string | undefined =
           request.headers.authorization?.split(" ")[1];
         if (!accessToken) {
-          throw {
-            status: 401,
-            message: "Invalid token",
-          };
+          return ResponseHandler.error(response, 401, "Invalid token");
         } else {
           try {
             const verifyRefreshToken: any = await jwt.verify(
@@ -37,36 +38,32 @@ class AuthMiddleware {
               pipeline
             );
             if (!employeeData.length) {
-              throw {
-                status: 401,
-                message: "Invalid token",
-              };
+              return ResponseHandler.error(response, 401, "Invalid token");
             }
             const userRole = employeeData[0].role;
 
             if (!allowedRoles.includes(userRole)) {
-              throw {
-                status: 401,
-                message: "You cannot access this api",
-              };
+              return ResponseHandler.error(
+                response,
+                403,
+                "You cannot access this api"
+              );
             } else {
               next();
             }
           } catch (error: any) {
             if (error.name === "TokenExpiredError") {
-              throw {
-                status: 401,
-                message: "Session expired,Please login again",
-              };
+              return ResponseHandler.error(
+                response,
+                401,
+                "Session expired,Please login again"
+              );
             }
-            throw {
-              status: 401,
-              message: error.message,
-            };
+            return ResponseHandler.error(response, 401, error.message);
           }
         }
       } catch (error: any) {
-        ResponseHandler.error(response, error.status, error.message);
+        return ResponseHandler.error(response, error.status, error.message);
       }
     };
   }

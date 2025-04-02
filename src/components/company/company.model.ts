@@ -1,6 +1,66 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { CompanyStatus } from "../../common/enums";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Address:
+ *       type: object
+ *       properties:
+ *         line1:
+ *           type: string
+ *         line2:
+ *           type: string
+ *         city:
+ *           type: string
+ *         state:
+ *           type: string
+ *         country:
+ *           type: string
+ *         zip:
+ *           type: number
+ *       required:
+ *         - line1
+ *         - city
+ *         - state
+ *         - country
+ *         - zip
+ *
+ *     Company:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *         address:
+ *           $ref: '#/components/schemas/Address'
+ *         contact:
+ *           type: string
+ *         status:
+ *           type: string
+ *           enum:
+ *             - ACTIVE
+ *             - INACTIVE
+ *           default: INACTIVE
+ *         isDeleted:
+ *           type: boolean
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *       required:
+ *         - name
+ *         - email
+ *         - address
+ *         - contact
+ *         - status
+ */
+
 export interface Address {
   line1: string;
   line2: string;

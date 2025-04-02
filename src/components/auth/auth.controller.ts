@@ -25,13 +25,8 @@ class AuthController {
   public registerEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
-      if (!request.body) {
-        logger.error("No body found");
-        ResponseHandler.error(response, 400, "No body found");
-      }
-
       const validationResult: ValidationResult<any> = await validateEmployee(
         request.body
       );
@@ -39,15 +34,17 @@ class AuthController {
         const errorMessages = validationResult.error.details
           .map((detail) => detail.message)
           .join(", ");
-        ResponseHandler.error(response, 400, errorMessages);
+        return ResponseHandler.error(response, 400, errorMessages);
       }
 
       const newEmployee = await this.employeeService.createEmployee(
         request.body
       );
 
+  
+
       logger.info("Employee created successfully");
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         201,
         "Employee created successfully!",
@@ -55,7 +52,7 @@ class AuthController {
       );
     } catch (error: any) {
       logger.error(error.message);
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "Internal server error"
@@ -66,18 +63,22 @@ class AuthController {
   public verifyEmployeeWithToken = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const { token } = request.params;
       if (!token) {
-        ResponseHandler.error(response, 400, "No token found");
+        return ResponseHandler.error(response, 404, "No token found");
       }
       await this.emailVerifyAndSend.verifyMail(token);
       logger.info("Employee verified successfully");
-      ResponseHandler.success(response, 200, "Employee verified successfully!");
+      return ResponseHandler.success(
+        response,
+        200,
+        "Employee verified successfully!"
+      );
     } catch (error: any) {
       logger.error(error.message);
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "Internal server error"
@@ -88,7 +89,7 @@ class AuthController {
   public authenticateEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const validationResult: ValidationResult<any> =
         await validateEmailPassword(request.body);
@@ -96,13 +97,14 @@ class AuthController {
         const errorMessages = validationResult.error.details
           .map((detail) => detail.message)
           .join(", ");
-        throw { status: 400, message: errorMessages };
+        return ResponseHandler.error(response, 401, errorMessages);
+
       }
 
       const { email, password } = request.body;
       const data = await this.authService.authenticateEmployee(email, password);
       logger.info("Employee authenticated successfully");
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         200,
         "Authenticated successfully!",
@@ -110,7 +112,7 @@ class AuthController {
       );
     } catch (error: any) {
       logger.error(error.message);
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "Internal server error"
@@ -121,17 +123,17 @@ class AuthController {
   public generateRefreshToken = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const { refreshToken } = request.body;
       if (!refreshToken) {
-        ResponseHandler.error(response, 400, "No token found");
+        return ResponseHandler.error(response, 404, "No token found");
       }
 
       const data = await this.authService.GenerateRefreshToken(refreshToken);
       logger.info("Tokens generated successfully!");
 
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         201,
         "Tokens generated successfully!",
@@ -139,7 +141,7 @@ class AuthController {
       );
     } catch (error: any) {
       logger.error(error.message);
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "Internal server error"

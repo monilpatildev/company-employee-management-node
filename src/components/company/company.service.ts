@@ -35,7 +35,19 @@ class CompanyService {
       if (!createCompany) {
         throw { status: 500, message: "Internal server error" };
       }
-      return createCompany;
+      const findCompanyPipeline: any[] = [
+        { $match: { _id: createCompany._id } },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+          },
+        },
+      ];
+      const foundCompany = await this.companyDao.getCompanyByIdOrEmail(
+        findCompanyPipeline
+      );
+      return foundCompany;
     } catch (error: any) {
       throw error;
     }
@@ -68,9 +80,21 @@ class CompanyService {
         id
       );
       if (!updatedCompany) {
-        throw { status: 400, message: "Company not found" };
+        throw { status: 404, message: "Company not found" };
       }
-      return updatedCompany;
+      const findCompanyPipeline: any[] = [
+        { $match: { _id: updatedCompany._id } },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+          },
+        },
+      ];
+      const foundCompany = await this.companyDao.getCompanyByIdOrEmail(
+        findCompanyPipeline
+      );
+      return foundCompany;
     } catch (error: any) {
       throw error;
     }
@@ -112,13 +136,14 @@ class CompanyService {
             createdAt: 0,
             updatedAt: 0,
             __v: 0,
+            isDeleted: 0,
           },
         },
       ];
       const companyDetails: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
       if (!companyDetails.length) {
-        throw { status: 400, message: "No company found!" };
+        throw { status: 404, message: "No company found!" };
       }
       return companyDetails;
     } catch (error: any) {
@@ -134,7 +159,7 @@ class CompanyService {
       await findCompany(id);
       const deletedCompany = await this.companyDao.deleteCompanyById(id);
       if (!deletedCompany) {
-        throw { status: 400, message: "No company found!" };
+        throw { status: 404, message: "No company found!" };
       }
       return deletedCompany;
     } catch (error: any) {

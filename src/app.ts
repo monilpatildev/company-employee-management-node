@@ -3,10 +3,10 @@ import { Server } from "http";
 import { config } from "dotenv";
 import { rateLimit } from "express-rate-limit";
 import path from "path";
-
 import MongoDBConnection from "./config/dbConnection";
 import InitialRoute from "./config/routes";
 import { ResponseHandler } from "./utils/responseHandler.util";
+
 
 config();
 

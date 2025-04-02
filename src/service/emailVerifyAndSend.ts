@@ -11,7 +11,7 @@ class EmailVerifyAndSend {
     this.employeeDao = new EmployeeDao();
   }
 
-  public sendEmail = async (email: string): Promise<void> => {
+  public sendEmail = async (email: string): Promise<any> => {
     try {
       const appPassword = process.env.CLIENT_SECRET;
       const token = await TokenEncryptDecrypt.encryptToken(email);
@@ -63,7 +63,7 @@ class EmailVerifyAndSend {
         const verifiedEmployee =
           await this.employeeDao.getEmployeeByEmailAndUpdate(decryptedEmail);
         if (!verifiedEmployee) {
-          throw { status: 400, message: "Employee not found" };
+          throw { status: 404, message: "Employee not found" };
         }
         return true;
       }

@@ -1,7 +1,6 @@
 import passwordManager from "../../utils/password.util";
 import EmployeeDao from "./employee.dao";
 import { IUser } from "./employee.model";
-import { pipeline } from "stream";
 import addToPipeline from "../../service/pipeline.service";
 import CompanyDao from "../company/company.dao";
 import { findEmployee } from "../../service/findEmpOrCom.service";
@@ -38,8 +37,25 @@ class EmployeeService {
         password: hashedPassword,
       };
       const createEmployee = await this.employeeDao.createEmployee(employee);
+      if (!createEmployee) {
+        throw { status: 500, message: "Internal server error" };
+      }
       await this.emailVerifyAndSend.sendEmail(email);
-      return createEmployee;
+      const findEmployeePipeline: any[] = [
+        { $match: { _id: createEmployee._id } },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+            password: 0,
+            role: 0,
+          },
+        },
+      ];
+      const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
+        findEmployeePipeline
+      );
+      return foundEmployee;
     } catch (error: any) {
       throw error;
     }
@@ -68,7 +84,21 @@ class EmployeeService {
       if (!updatedEmployee) {
         throw { status: 500, message: "Internal server error" };
       }
-      return updatedEmployee;
+      const findEmployeePipeline: any[] = [
+        { $match: { _id: updatedEmployee._id } },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+            password: 0,
+            role: 0,
+          },
+        },
+      ];
+      const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
+        findEmployeePipeline
+      );
+      return foundEmployee;
     } catch (error: any) {
       throw error;
     }
@@ -92,7 +122,7 @@ class EmployeeService {
       );
 
       if (!foundCompany.length) {
-        throw { status: 400, message: "Company not found!" };
+        throw { status: 404, message: "Company not found!" };
       }
       const updatedEmployee = await this.employeeDao.updateEmployeeById(
         companyId,
@@ -101,7 +131,21 @@ class EmployeeService {
       if (!updatedEmployee) {
         throw { status: 500, message: "Internal server error" };
       }
-      return updatedEmployee;
+      const findEmployeePipeline: any[] = [
+        { $match: { _id: updatedEmployee._id } },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+            password: 0,
+            role: 0,
+          },
+        },
+      ];
+      const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
+        findEmployeePipeline
+      );
+      return foundEmployee;
     } catch (error: any) {
       throw error;
     }
@@ -112,30 +156,41 @@ class EmployeeService {
       if (!isObjectIdOrHexString(id)) {
         throw { status: 400, message: "Invalid employee id" };
       }
-      await findEmployee(id);
+
       const pipeline: any[] = [
         { $match: { _id: new Types.ObjectId(id), isDeleted: false } },
-        {
-          $project: {
-            createdAt: 0,
-            updatedAt: 0,
-            __v: 0,
-          },
-        },
+
         {
           $lookup: {
             from: "companies",
             localField: "companyId",
             foreignField: "_id",
             as: "company",
+            pipeline: [
+              {
+                $project: {
+                  __v: 0,
+                  isDeleted: 0,
+                },
+              },
+            ],
           },
         },
         { $unwind: "$company" },
+        {
+          $project: {
+            __v: 0,
+            isDeleted: 0,
+            role: 0,
+            password: 0,
+            companyId: 0,
+          },
+        },
       ];
       const employeeDetails: IUser[] =
         await this.employeeDao.getEmployeeByIdOrEmail(pipeline);
       if (!employeeDetails.length) {
-        throw { status: 400, message: "Employee not found!" };
+        throw { status: 404, message: "Employee not found!" };
       }
       return employeeDetails;
     } catch (error: any) {
@@ -148,10 +203,10 @@ class EmployeeService {
       if (!isObjectIdOrHexString(id)) {
         throw { status: 400, message: "Invalid employee id" };
       }
-      await findEmployee(id);
       const deleteEmployee = await this.employeeDao.deleteEmployeeById(id);
+
       if (!deleteEmployee) {
-        throw { status: 500, message: "Internal server error" };
+        throw { status: 404, message: "Employee not found!" };
       }
       return deleteEmployee;
     } catch (error: any) {

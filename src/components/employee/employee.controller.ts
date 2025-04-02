@@ -13,20 +13,20 @@ class EmployeeController {
   public getAllEmployees = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const allEmployees = await this.employeeService.getAllEmployeesDetail(
         request.query
       );
       logger.info("Fetch all employees successFully!");
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         200,
         `Fetch ${allEmployees.length} employees`,
         allEmployees
       );
     } catch (error: any) {
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "internal server error"
@@ -37,14 +37,14 @@ class EmployeeController {
   public updateEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const validateEmp = await validateEmployee(request.body, false, true);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        throw { status: 400, message: errorMessages };
+          return ResponseHandler.error(response, 401, errorMessages);
       }
       const newEmployee = await this.employeeService.updateFullEmployeeDetails(
         request.body,
@@ -52,14 +52,14 @@ class EmployeeController {
       );
       logger.info("Employee updated successFully!");
 
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         200,
         "Employee updated successFully!",
         newEmployee
       );
     } catch (error: any) {
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "internal server error"
@@ -70,14 +70,14 @@ class EmployeeController {
   public modifyEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const validateEmp = await validateEmployee(request.body, true, false);
       if (validateEmp.error) {
         const errorMessages = validateEmp.error.details
           .map((detail) => detail.message)
           .join(", ");
-        throw { status: 400, message: errorMessages };
+          return ResponseHandler.error(response, 401, errorMessages);
       }
       const newEmployee = await this.employeeService.modifyEmployeeDetails(
         request.body.companyId,
@@ -85,14 +85,14 @@ class EmployeeController {
       );
       logger.info("Employee updated successFully!");
 
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         200,
         "Employee updated successFully!",
         newEmployee
       );
     } catch (error: any) {
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "internal server error"
@@ -103,20 +103,20 @@ class EmployeeController {
   public getEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const foundEmployee = await this.employeeService.getEmployeeDetail(
         request.params.id
       );
       logger.info("Fetch  employee successFully!");
-      ResponseHandler.success(
+      return ResponseHandler.success(
         response,
         200,
         "Fetch Employee successFully!",
         foundEmployee[0]
       );
     } catch (error: any) {
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "internal server error"
@@ -127,15 +127,19 @@ class EmployeeController {
   public deleteEmployee = async (
     request: Request,
     response: Response
-  ): Promise<void> => {
+  ): Promise<any> => {
     try {
       const foundEmployee = await this.employeeService.deleteEmployee(
         request.params.id
       );
       logger.info("Employee deleted successFully!");
-      ResponseHandler.success(response, 200, "Employee deleted successFully!");
+      return ResponseHandler.success(
+        response,
+        200,
+        "Employee deleted successFully!"
+      );
     } catch (error: any) {
-      ResponseHandler.error(
+      return ResponseHandler.error(
         response,
         error.status || 500,
         error.message || "internal server error"

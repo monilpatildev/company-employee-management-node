@@ -1,6 +1,68 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import { Designation, Role } from "../../common/enums";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Employee:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *           description: The employee's first name.
+ *         lastName:
+ *           type: string
+ *           description: The employee's last name.
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The employee's email address.
+ *         password:
+ *           type: string
+ *           description: The employee's password.
+ *         isVerified:
+ *           type: boolean
+ *           description: Indicates whether the employee's email is verified.
+ *         designation:
+ *           type: string
+ *           description: The designation of the employee.
+ *           enum:
+ *             - DEVELOPER
+ *             - MANAGER
+ *             - DESIGNER
+ *             - QA
+ *             - OTHER
+ *           default: DEVELOPER
+ *         companyId:
+ *           type: string
+ *           description: MongoDB ObjectId referencing the company.
+ *         reporters:
+ *           type: string
+ *           description: MongoDB ObjectId referencing the reporter employee.
+ *         code:
+ *           type: number
+ *           description: A unique employee code.
+ *         role:
+ *           type: string
+ *           description: The role assigned to the employee.
+ *           enum:
+ *             - USER
+ *             - ADMIN
+ *           default: USER
+ *         isDeleted:
+ *           type: boolean
+ *           description: Soft delete flag for the employee.
+ *       required:
+ *         - firstName
+ *         - lastName
+ *         - email
+ *         - password
+ *         - designation
+ *         - role
+ */
+
+
 export interface IUser extends Document {
   firstName: string;
   lastName: string;

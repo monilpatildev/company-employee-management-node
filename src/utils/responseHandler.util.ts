@@ -1,11 +1,23 @@
 import { Response } from "express";
 
-class ResponseHandler {
+export interface ErrorResponse {
+  response: Response;
+  status: number;
+  message: string;
+}
+export interface SuccessResponse {
+  response: Response;
+  status: number;
+  message: string;
+  data?: any;
+}
+
+export class ResponseHandler {
   static success(
     response: Response,
-    status: number ,
+    status: number,
     message: string,
-    data?: any,
+    data?: any
   ): Response {
     return response.status(status).json({
       status,
@@ -27,5 +39,3 @@ class ResponseHandler {
   }
 }
 
-
-export { ResponseHandler };
