@@ -98,7 +98,7 @@ const companyRoutes = Router();
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session expired , login again"
  *       403:
@@ -235,7 +235,7 @@ companyRoutes.post(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session is expired, authenticate again"
  *       403:
@@ -282,7 +282,7 @@ companyRoutes.get(
 
 /**
  * @swagger
- * /api/companies/:id:
+ * /api/companies/{id}:
  *   get:
  *     tags:
  *       - Company
@@ -362,7 +362,7 @@ companyRoutes.get(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session expired , login again"
  *       403:
@@ -411,7 +411,7 @@ companyRoutes.get(
 
 /**
  * @swagger
- * /api/companies/:id:
+ * /api/companies/{id}:
  *   put:
  *     tags:
  *       - Company
@@ -509,7 +509,7 @@ companyRoutes.get(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session expired , login again"
  *       403:
@@ -554,9 +554,10 @@ companyRoutes.put(
   AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.updateCompany
 );
+
 /**
  * @swagger
- * /api/companies/:id:
+ * /api/companies/{id}:
  *   patch:
  *     tags:
  *       - Company
@@ -645,7 +646,7 @@ companyRoutes.put(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session expired , login again"
  *       403:
@@ -684,6 +685,7 @@ companyRoutes.put(
  *               message: "Internal server error"
  *
  */
+
 companyRoutes.patch(
   "/:id",
   AuthMiddleware.authenticate([Role.ADMIN]),
@@ -692,7 +694,7 @@ companyRoutes.patch(
 
 /**
  * @swagger
- * /api/companies/:id:
+ * /api/companies/{id}:
  *   delete:
  *     tags:
  *       - Company
@@ -759,7 +761,7 @@ companyRoutes.patch(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
  *               message: "Session expired , login again"
  *       403:
@@ -798,10 +800,152 @@ companyRoutes.patch(
  *               message: "Internal server error"
  *
  */
+
 companyRoutes.delete(
   "/:id",
   AuthMiddleware.authenticate([Role.ADMIN]),
   CompanyController.deleteCompany
 );
+
+/**
+ * @swagger
+ * /api/companies/tree/{id}:
+ *   get:
+ *     tags:
+ *       - Company
+ *     summary: Get Company Tree 
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Company ID
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Company tree retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Company'
+ *             example:
+ *               status: 200
+ *               success: true
+ *               message: "Fetch company successFully!"
+ *               data:
+ *                 _id: "67e542ca2d70f8f7cc01a96f"
+ *                 name: "Acme Corporation"
+ *                 email: "contact@acmecorp.com"
+ *                 address:
+ *                   line1: "123 Industrial Road"
+ *                   city: "Mumbai"
+ *                   state: "Maharashtra"
+ *                   country: "India"
+ *                   zip: "400001"
+ *                 contact: "9123456780"
+ *                 status: "ACTIVE"
+ *                 managers:
+ *                   - _id: "67e68afb450a34622b877a72"
+ *                     firstName: "test1Updated"
+ *                     lastName: "test lastName"
+ *                     email: "hali@kk.com"
+ *                     designation: "MANAGER"
+ *                     isVerified: true
+ *                     companyId: "67e542ca2d70f8f7cc01a96f"
+ *                     nestedReportees:
+ *                       - _id: "67e68b06450a34622b877a75"
+ *                         firstName: "Jane"
+ *                         lastName: "Smith"
+ *                         email: "jane.smith@gmail.com"
+ *                         designation: "TEAM_LEADER"
+ *                         isVerified: true
+ *                         companyId: "67e542ca2d70f8f7cc01a96f"
+ *       400:
+ *         description: Bad Request - Invalid company id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 400
+ *               success: false
+ *               message: "Invalid company id"
+ *       401:
+ *         description: Session expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 401
+ *               success: false
+ *               message: "Session expired, login again"
+ *       403:
+ *         description: Access denied
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 403
+ *               success: false
+ *               message: "You cannot access this api"
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 500
+ *               success: false
+ *               message: "Internal server error"
+ */
+
+companyRoutes.get(
+  "/tree/:id",
+  AuthMiddleware.authenticate([Role.ADMIN]),
+  CompanyController.getCompanyTree
+);
+
 
 export default companyRoutes;

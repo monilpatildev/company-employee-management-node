@@ -3,7 +3,6 @@ import EmployeeDao from "./employee.dao";
 import { IUser } from "./employee.model";
 import addToPipeline from "../../service/pipeline.service";
 import CompanyDao from "../company/company.dao";
-import { findEmployee } from "../../service/findEmpOrCom.service";
 import { isObjectIdOrHexString, Types } from "mongoose";
 import EmailVerifyAndSend from "../../service/emailVerifyAndSend";
 
@@ -65,87 +64,76 @@ class EmployeeService {
     employeeData: any,
     id: string
   ): Promise<any> => {
-    try {
-      if (!isObjectIdOrHexString(id)) {
-        throw { status: 400, message: "Invalid employee id" };
-      }
-      await findEmployee(id);
-      const pipeline: any[] = [{ $match: { email: employeeData.email } }];
-      const foundEmail = await this.employeeDao.getEmployeeByIdOrEmail(
-        pipeline
-      );
-      if (foundEmail.length) {
-        throw { status: 400, message: "Email already used" };
-      }
-      const updatedEmployee = await this.employeeDao.updateEmployeeById(
-        employeeData,
-        id
-      );
-      if (!updatedEmployee) {
-        throw { status: 500, message: "Internal server error" };
-      }
-      const findEmployeePipeline: any[] = [
-        { $match: { _id: updatedEmployee._id } },
-        {
-          $project: {
-            __v: 0,
-            isDeleted: 0,
-            password: 0,
-            role: 0,
-          },
-        },
-      ];
-      const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
-        findEmployeePipeline
-      );
-      return foundEmployee;
-    } catch (error: any) {
-      throw error;
+    if (!isObjectIdOrHexString(id)) {
+      throw { status: 400, message: "Invalid employee id" };
     }
+    const employeeFilter = {
+      _id: new Types.ObjectId(id),
+      isDeleted: false,
+    };
+    const employee = await this.employeeDao.getEmployeeByIdOrEmail([
+      { $match: employeeFilter },
+    ]);
+    if (!employee.length) {
+      throw { status: 404, message: "Employee not found!" };
+    }
+    const emailFilter = { $match: { email: employeeData.email } };
+    const foundEmail = await this.employeeDao.getEmployeeByIdOrEmail([
+      emailFilter,
+    ]);
+
+    if (foundEmail.length) {
+      throw { status: 400, message: "Email already used" };
+    }
+    const updatedEmployee = await this.employeeDao.updateEmployeeById(
+      employeeData,
+      id
+    );
+
+    if (!updatedEmployee) {
+      throw { status: 500, message: "Internal server error" };
+    }
+    const projectionPipeline = [
+      { $match: { _id: updatedEmployee._id } },
+      { $project: { __v: 0, isDeleted: 0, password: 0, role: 0 } },
+    ];
+    const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
+      projectionPipeline
+    );
+    return foundEmployee;
   };
 
   public modifyEmployeeDetails = async (
-    companyId: any,
+    employeeData: any,
     id: string
   ): Promise<any> => {
     try {
-      if (!isObjectIdOrHexString(id)) {
-        throw { status: 400, message: "Invalid employee id" };
+      const employeeFilter = {
+        _id: new Types.ObjectId(id),
+        isDeleted: false,
+      };
+      const employee = await this.employeeDao.getEmployeeByIdOrEmail([
+        { $match: employeeFilter },
+      ]);
+      if (!employee.length) {
+        throw { status: 404, message: "Employee not found!" };
       }
-      await findEmployee(id);
-      const companyPipeline: any[] = [
-        { $match: { _id: new Types.ObjectId(companyId) } },
-      ];
 
-      const foundCompany = await this.companyDao.getCompanyByIdOrEmail(
-        companyPipeline
-      );
+      const companyFilter = {
+        _id: new Types.ObjectId(employeeData.companyId),
+        isDeleted: false,
+      };
+      const company = await this.companyDao.getCompanyByIdOrEmail([
+        { $match: companyFilter },
+      ]);
+      console.log(company, employeeData.companyId);
 
-      if (!foundCompany.length) {
+      if (!company.length) {
         throw { status: 404, message: "Company not found!" };
       }
-      const updatedEmployee = await this.employeeDao.updateEmployeeById(
-        companyId,
-        id
-      );
-      if (!updatedEmployee) {
-        throw { status: 500, message: "Internal server error" };
-      }
-      const findEmployeePipeline: any[] = [
-        { $match: { _id: updatedEmployee._id } },
-        {
-          $project: {
-            __v: 0,
-            isDeleted: 0,
-            password: 0,
-            role: 0,
-          },
-        },
-      ];
-      const foundEmployee = await this.employeeDao.getEmployeeByIdOrEmail(
-        findEmployeePipeline
-      );
-      return foundEmployee;
+
+      const updatedEmployee = this.updateFullEmployeeDetails(employeeData, id);
+      return updatedEmployee;
     } catch (error: any) {
       throw error;
     }
@@ -189,6 +177,8 @@ class EmployeeService {
       ];
       const employeeDetails: IUser[] =
         await this.employeeDao.getEmployeeByIdOrEmail(pipeline);
+      console.log(employeeDetails);
+
       if (!employeeDetails.length) {
         throw { status: 404, message: "Employee not found!" };
       }

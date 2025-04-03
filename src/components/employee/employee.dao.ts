@@ -40,6 +40,7 @@ class EmployeeDao {
     try {
       const updatedEmployee = await EmployeeModel.findByIdAndUpdate(id, data, {
         new: true,
+        upsert: true,
       });
       return updatedEmployee;
     } catch (error: any) {

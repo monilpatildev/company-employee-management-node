@@ -13,7 +13,9 @@ class CompanyDao {
     try {
       return await CompanyModel.aggregate(pipeline);
     } catch (error: any) {
-      throw { status: 400, message: "Internal server error" };
+      console.log(error);
+
+      throw { status: 500, message: "Internal server error" };
     }
   };
 

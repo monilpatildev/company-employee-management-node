@@ -31,8 +31,6 @@ import { Designation, Role } from "../../common/enums";
  *             - DEVELOPER
  *             - MANAGER
  *             - DESIGNER
- *             - QA
- *             - OTHER
  *           default: DEVELOPER
  *         companyId:
  *           type: string
@@ -61,7 +59,6 @@ import { Designation, Role } from "../../common/enums";
  *         - designation
  *         - role
  */
-
 
 export interface IUser extends Document {
   firstName: string;
@@ -107,10 +104,12 @@ const employeeSchema: Schema<IUser> = new mongoose.Schema({
     ref: "Company",
   },
   isVerified: { type: Boolean, default: false },
-  reporters: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Employee",
-  },
+  reporters: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+    },
+  ],
   code: {
     type: Number,
   },

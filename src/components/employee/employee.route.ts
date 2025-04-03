@@ -81,16 +81,16 @@ const employeeRoutes = Router();
   *                  firstName: "test"
   *                  lastName: "lastName"
   *                  email: "monilp685@gmail.com"
-  *                  designation": "DEVELOPER"
-  *                  isVerified": true
-  *                  company": "Beta Innovations"
+  *                  designation: "DEVELOPER"
+  *                  isVerified: true
+  *                  company : "Beta Innovations"
   *                - _id: "67e66ecfafc62907ab5a2c7c"
   *                  firstName: "test"
   *                  lastName: "lastName"
   *                  email: "monilp685@gmail.com"
-  *                  designation": "DEVELOPER"
-  *                  isVerified": true
-  *                  company": "Beta Innovations"
+  *                  designation: "DEVELOPER"
+  *                  isVerified: true
+  *                  company: "Beta Innovations"
  *       401:
  *         description: Bad Request - Invalid session or authentication issue
  *         content:
@@ -143,7 +143,7 @@ employeeRoutes.get(
  *     parameters:
  *       - name: id
  *         in: path
- *         description: ID of the employee to update
+ *         description: Id of the employee to update
  *         required: true
  *         schema:
  *           type: string
@@ -155,6 +155,7 @@ employeeRoutes.get(
  *             $ref: '#/components/schemas/Employee'
  *             example:
  *               firstName: "John"
+ *               lastName: "Doe"
  *               email: "john.doe@example.com"
  *     responses:
  *       200:
@@ -272,23 +273,36 @@ employeeRoutes.put(
   EmployeeController.updateEmployee
 );
 
+
 /**
  * @swagger
- * /api/employees/:id:
+ * /api/employees/{id}:
  *   patch:
  *     tags:
  *       - Employee
- *     summary: Modify employee
+ *     summary: Update employee
  *     parameters:
- *       - name: :id
- *         in: param
- *         description: Modify employee with id
+ *       - name: id
+ *         in: path
+ *         description: ID of the employee to update
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - companyId
+ *             properties:
+ *               companyId:
+ *                 type: string
+ *                 description: The company id.
  *     responses:
  *       200:
- *         description: Employee modified successfully
+ *         description: Employee updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -316,19 +330,19 @@ employeeRoutes.put(
  *                     isVerified:
  *                       type: boolean
  *                     company:
- *                       type: string
+ *                       $ref: '#/components/schemas/Company'
  *             example:
  *               status: 200
  *               success: true
- *               message: "Employee modified successfully!"
+ *               message: "Fetch Employee successFully!"
  *               data:
-  *                  _id: "67e66ecfafc62907ab5a2c7c"
-  *                  firstName: "test"
-  *                  lastName: "lastName"
-  *                  email: "monilp685@gmail.com"
-  *                  designation": "DEVELOPER"
-  *                  isVerified": true
-  *                  company": "Beta Innovations"
+ *                 _id: "67e68afb450a34622b877a72"
+ *                 firstName: "John"
+ *                 lastName: "Doe"
+ *                 email: "john.doe@gmail.com"
+ *                 designation: "DEVELOPER"
+ *                 isVerified: true
+ *                 companyId: "67e5429e2d70f8f7cc01a96b"
  *       400:
  *         description: Bad Request - Invalid employee id
  *         content:
@@ -347,7 +361,7 @@ employeeRoutes.put(
  *               success: false
  *               message: "Invalid employee id"
  *       401:
- *         description: Session expired
+ *         description: Session expired - login again
  *         content:
  *           application/json:
  *             schema:
@@ -360,11 +374,11 @@ employeeRoutes.put(
  *                 message:
  *                   type: string
  *             example:
- *               status: 400
+ *               status: 401
  *               success: false
- *               message: "Session expired , login again"
+ *               message: "Session expired, login again"
  *       500:
- *         description: Server Error
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -380,8 +394,8 @@ employeeRoutes.put(
  *               status: 500
  *               success: false
  *               message: "Internal server error"
- *
  */
+
 
 employeeRoutes.patch(
   "/:id",
@@ -395,21 +409,15 @@ employeeRoutes.patch(
  *   get:
  *     tags:
  *       - Employee
- *     summary: Get employee by companyId
+ *     summary: Get employee by id
  *     description: Retrieve an employee by providing the companyId in the request body.
- *     requestBody:
- *       description: Company identifier
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               companyId:
- *                 type: string
- *                 description: The company ID to fetch the employee.
- *             example:
- *               companyId: "60d0fe4f5311236168a109ca"
+ *     parameters:
+ *       - name: :id
+ *         in: param
+ *         description: Get company with id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Employee retrieved successfully
@@ -524,6 +532,94 @@ employeeRoutes.get(
   AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),
   EmployeeController.getEmployee
 );
+
+
+/**
+ * @swagger
+ * /api/employees:
+ *   delete:
+ *     tags:
+ *       - Employee
+ *     summary: Delete employee by id
+ *     description: Delete employee by id
+ *     parameters:
+ *       - name: :id
+ *         in: param
+ *         description: delete company with id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Employee deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 200
+ *               success: true
+ *               message: "Employee deleted successfully!"
+ *       400:
+ *         description: Bad Request - Invalid employee id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 400
+ *               success: false
+ *               message: "Invalid employee id"
+ *       401:
+ *         description: Session expired - login again
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 401
+ *               success: false
+ *               message: "Session expired, login again"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *             example:
+ *               status: 500
+ *               success: false
+ *               message: "Internal server error"
+ */
+
 employeeRoutes.delete(
   "/:id",
   AuthMiddleware.authenticate([Role.USER, Role.ADMIN]),

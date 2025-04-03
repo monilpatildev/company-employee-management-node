@@ -14,6 +14,9 @@ export const validateEmployee = (
         "string.empty": "companyId cannot be empty",
         "any.required": "companyId is required",
       }),
+      reporters: Joi.array().items(Joi.string()).messages({
+        "array.base": "reporters must be an array",
+      }),
     });
 
     return patchSchema.validate(data, {

@@ -54,7 +54,7 @@ class AuthService {
           email: user.email,
         },
         accessSecretKey,
-        { expiresIn: "30m" }
+        { expiresIn: "2h" }
       );
       const refreshToken = await jwt.sign(
         {

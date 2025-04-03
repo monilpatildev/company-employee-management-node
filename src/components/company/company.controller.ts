@@ -181,6 +181,30 @@ class CompanyController {
       );
     }
   };
+
+  public getCompanyTree = async (
+    request: Request,
+    response: Response
+  ): Promise<any> => {
+    try {
+      const foundCompany = await this.companyService.getCompanyTreeDetail(
+        request.params.id
+      );
+      logger.info("Fetch company successFully!");
+      return ResponseHandler.success(
+        response,
+        200,
+        "Fetch company successFully!",
+        foundCompany[0]
+      );
+    } catch (error: any) {
+      return ResponseHandler.error(
+        response,
+        error.status || 500,
+        error.message || "internal server error"
+      );
+    }
+  };
 }
 
 export default new CompanyController();

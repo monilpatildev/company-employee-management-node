@@ -80,7 +80,7 @@ class EmployeeController {
           return ResponseHandler.error(response, 401, errorMessages);
       }
       const newEmployee = await this.employeeService.modifyEmployeeDetails(
-        request.body.companyId,
+        request.body,
         request.params.id
       );
       logger.info("Employee updated successFully!");
@@ -89,7 +89,7 @@ class EmployeeController {
         response,
         200,
         "Employee updated successFully!",
-        newEmployee
+        newEmployee[0]
       );
     } catch (error: any) {
       return ResponseHandler.error(

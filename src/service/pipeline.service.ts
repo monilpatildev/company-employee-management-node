@@ -25,7 +25,7 @@ const addToPipeline = (
     return { $match: {} };
   }
 
-  return { $match: { $or: conditions } };
+  return { $match: { $and: conditions } };
 };
 
 export default addToPipeline;

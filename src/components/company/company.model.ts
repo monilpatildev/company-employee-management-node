@@ -44,7 +44,7 @@ import { CompanyStatus } from "../../common/enums";
  *           enum:
  *             - ACTIVE
  *             - INACTIVE
- *           default: INACTIVE
+ *           default: ACTIVE
  *         isDeleted:
  *           type: boolean
  *         createdAt:
@@ -96,7 +96,7 @@ const companySchema: Schema<ICompany> = new mongoose.Schema(
       type: String,
       required: true,
       enum: Object.values(CompanyStatus),
-      default: CompanyStatus.INACTIVE,
+      default: CompanyStatus.ACTIVE,
     },
     isDeleted: { type: Boolean, default: false },
   },
