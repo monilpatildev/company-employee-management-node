@@ -2,6 +2,7 @@ import { isObjectIdOrHexString, Types } from "mongoose";
 import CompanyDao from "./company.dao";
 import { ICompany } from "./company.model";
 import addToPipeline from "../../service/pipeline.service";
+import generateTree from "../../service/generateTree.service";
 
 class CompanyService {
   private companyDao: CompanyDao;
@@ -193,59 +194,17 @@ class CompanyService {
             from: "employees",
             localField: "_id",
             foreignField: "companyId",
-            as: "managers",
+            as: "employees",
             pipeline: [
               {
                 $match: {
                   role: { $ne: "ADMIN" },
-                  designation: "MANAGER",
                 },
               },
-              {
-                $graphLookup: {
-                  from: "employees",
-                  startWith: "$reporters",
-                  connectFromField: "reporters",
-                  connectToField: "_id",
-                  as: "allReportees",
-                },
-              },
+
               {
                 $addFields: {
-                  nestedReportees: {
-                    $function: {
-                      body:
-                        "function(manager, allReportees) { " +
-                        "  var lookup = {}; " +
-                        "  for (var emp of allReportees) { " +
-                        "    emp.reportees = []; " +
-                        "    lookup[emp._id.toString()] = emp; " +
-                        "  } " +
-                        "  for (var emp of allReportees) { " +
-                        "    if (emp.reporters && emp.reporters.length) { " +
-                        "      for (var childId of emp.reporters) { " +
-                        "        var child = lookup[childId.toString()]; " +
-                        "        if (child) { " +
-                        "          emp.reportees.push(child); " +
-                        "        } " +
-                        "      } " +
-                        "    } " +
-                        "  } " +
-                        "  var nested = []; " +
-                        "  if (manager.reporters && manager.reporters.length) { " +
-                        "    for (var repId of manager.reporters) { " +
-                        "      var rep = lookup[repId.toString()]; " +
-                        "      if (rep) { " +
-                        "        nested.push(rep); " +
-                        "      } " +
-                        "    } " +
-                        "  } " +
-                        "  return nested; " +
-                        "}",
-                      args: ["$$ROOT", "$allReportees"],
-                      lang: "js",
-                    },
-                  },
+                  reporter: { $first: "$reporters" },
                 },
               },
               {
@@ -256,222 +215,12 @@ class CompanyService {
                   createdAt: 0,
                   updatedAt: 0,
                   reporters: 0,
-                  role: 0,
-                  allReportees: 0,
                 },
               },
             ],
           },
         },
       ];
-
-      // const pipeline: any[] = [
-      //   { $match: { _id: new Types.ObjectId(id), isDeleted: false } },
-      //   {
-      //     $project: {
-      //       createdAt: 0,
-      //       updatedAt: 0,
-      //       __v: 0,
-      //       isDeleted: 0,
-      //       password: 0,
-      //     },
-      //   },
-      //   {
-      //     $lookup: {
-      //       from: "employees",
-      //       localField: "_id",
-      //       foreignField: "companyId",
-      //       as: "managers",
-      //       pipeline: [
-      //         {
-      //           $match: { role: { $ne: "ADMIN" }, designation: "MANAGER" },
-      //         },
-      //         {
-      //           $lookup: {
-      //             from: "employees",
-      //             localField: "reporters",
-      //             foreignField: "_id",
-      //             as: "reportees",
-      //             pipeline: [
-      //               {
-      //                 $project: {
-      //                   __v: 0,
-      //                   isDeleted: 0,
-      //                   password: 0,
-      //                   createdAt: 0,
-      //                   updatedAt: 0,
-      //                   role: 0,
-      //                 },
-      //               },
-      //             ],
-      //             // pipeline: [
-      //             //   {
-      //             //     $lookup: {
-      //             //       from: "employees",
-      //             //       localField: "reporters",
-      //             //       foreignField: "_id",
-      //             //       as: "reportees",
-      //             //       pipeline: [
-      //             //         {
-      //             //           $lookup: {
-      //             //             from: "employees",
-      //             //             localField: "reporters",
-      //             //             foreignField: "_id",
-      //             //             as: "reportees",
-      //             //             pipeline: [
-      //             //               {
-      //             //                 $lookup: {
-      //             //                   from: "employees",
-      //             //                   localField: "reporters",
-      //             //                   foreignField: "_id",
-      //             //                   as: "reportees",
-      //             //                   pipeline: [
-      //             //                     {
-      //             //                       $lookup: {
-      //             //                         from: "employees",
-      //             //                         localField: "reporters",
-      //             //                         foreignField: "_id",
-      //             //                         as: "reportees",
-      //             //                         pipeline: [
-      //             //                           {
-      //             //                             $project: {
-      //             //                               __v: 0,
-      //             //                               isDeleted: 0,
-      //             //                               password: 0,
-      //             //                               createdAt: 0,
-      //             //                               updatedAt: 0,
-      //             //                               reporters: 0,
-      //             //                               role: 0,
-      //             //                             },
-      //             //                           },
-      //             //                         ],
-      //             //                       },
-      //             //                     },
-      //             //                     {
-      //             //                       $project: {
-      //             //                         __v: 0,
-      //             //                         isDeleted: 0,
-      //             //                         password: 0,
-      //             //                         createdAt: 0,
-      //             //                         updatedAt: 0,
-      //             //                         reporters: 0,
-      //             //                         role: 0,
-      //             //                       },
-      //             //                     },
-      //             //                   ],
-      //             //                 },
-      //             //               },
-      //             //               {
-      //             //                 $project: {
-      //             //                   __v: 0,
-      //             //                   isDeleted: 0,
-      //             //                   password: 0,
-      //             //                   createdAt: 0,
-      //             //                   updatedAt: 0,
-      //             //                   reporters: 0,
-      //             //                   role: 0,
-      //             //                 },
-      //             //               },
-      //             //             ],
-      //             //           },
-      //             //         },
-      //             //         {
-      //             //           $project: {
-      //             //             __v: 0,
-      //             //             isDeleted: 0,
-      //             //             password: 0,
-      //             //             createdAt: 0,
-      //             //             updatedAt: 0,
-      //             //             reporters: 0,
-      //             //             role: 0,
-      //             //           },
-      //             //         },
-      //             //       ],
-      //             //     },
-      //             //   },
-      //             //   {
-      //             //     $project: {
-      //             //       __v: 0,
-      //             //       isDeleted: 0,
-      //             //       password: 0,
-      //             //       createdAt: 0,
-      //             //       updatedAt: 0,
-      //             //       reporters: 0,
-      //             //       role: 0,
-      //             //     },
-      //             //   },
-      //             // ],
-      //           },
-      //         },
-      //         {
-      //           $project: {
-      //             __v: 0,
-      //             isDeleted: 0,
-      //             password: 0,
-      //             createdAt: 0,
-      //             updatedAt: 0,
-      //             reporters: 0,
-      //             role: 0,
-      //           },
-      //         },
-      //       ],
-      //     },
-      //   },
-      // ];
-
-      // const pipeline = [
-      //   {
-      //     $match: {
-      //       _id: new Types.ObjectId(id),
-      //       isDeleted: false,
-      //     },
-      //   },
-      //   {
-      //     $project: {
-      //       createdAt: 0,
-      //       updatedAt: 0,
-      //       __v: 0,
-      //       isDeleted: 0,
-      //       password: 0,
-      //     },
-      //   },
-      //   {
-      //     $lookup: {
-      //       from: "employees",
-      //       localField: "_id",
-      //       foreignField: "companyId",
-      //       as: "managers",
-      //       pipeline: [
-      //         {
-      //           $match: {
-      //             role: { $ne: "ADMIN" },
-      //             designation: "MANAGER",
-      //           },
-      //         },
-      //         {
-      //           $graphLookup: {
-      //             from: "employees",
-      //             startWith: "$_id",
-      //             connectFromField: "reporters",
-      //             connectToField: "_id",
-      //             as: "reporters",
-      //             maxDepth: 10,
-      //             depthField: "depth",
-      //           },
-      //         },
-      //         {
-      //           $project: {
-      //             __v: 0,
-      //             isDeleted: 0,
-      //             password: 0,
-      //             createdAt: 0,
-      //             updatedAt: 0,
-      //           },
-      //         },
-      //       ],
-      //     },
-      //   },
-      // ];
 
       const companyDetails: ICompany[] =
         await this.companyDao.getCompanyByIdOrEmail(pipeline);
@@ -481,6 +230,9 @@ class CompanyService {
           message: "Company not found!",
         };
       }
+      const companyTree = generateTree(companyDetails[0]);
+      companyDetails[0] = companyTree;
+
       return companyDetails;
     } catch (error: any) {
       throw error;

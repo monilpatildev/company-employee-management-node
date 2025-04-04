@@ -80,14 +80,14 @@ const employeeRoutes = Router();
   *                - _id: "67e66ecfafc62907ab5a2c7c"
   *                  firstName: "test"
   *                  lastName: "lastName"
-  *                  email: "monilp685@gmail.com"
+  *                  email: "test@gmail.com"
   *                  designation: "DEVELOPER"
   *                  isVerified: true
   *                  company : "Beta Innovations"
   *                - _id: "67e66ecfafc62907ab5a2c7c"
   *                  firstName: "test"
   *                  lastName: "lastName"
-  *                  email: "monilp685@gmail.com"
+  *                  email: "test@gmail.com"
   *                  designation: "DEVELOPER"
   *                  isVerified: true
   *                  company: "Beta Innovations"

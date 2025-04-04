@@ -23,12 +23,12 @@ class EmailVerifyAndSend {
       const transport = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: "monilp.webosmotic@gmail.com",
+          user: "YOUR EMAIL",
           pass: appPassword,
         },
       });
       const mailOptions = {
-        from: " <monilp.webosmotic@gmail.com>",
+        from: " <YOUR EMAIL>",
         to: email,
         subject: "Verify Your Email Address",
         text: "Hello from gmail text using API",
